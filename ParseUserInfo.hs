@@ -25,6 +25,15 @@ data Commit = Commit {id :: String,
 data Author = Author {	name :: String,
 			email :: String
 		     } deriving GHC.Generics.Generic
+             
+data Repo = Repo { name :: String,
+            url :: String,
+            description :: String,
+            homepage :: String,
+            git_http_url :: String,
+            git_ssh_url :: String,
+            visibility_level :: Int            
+            } deriving GHC.Generics.Generic
         
 data User = User {	object_kind :: String,
 			event_name :: String,
@@ -41,12 +50,14 @@ data User = User {	object_kind :: String,
 			project :: Object,
 			commits :: [Commit],
 			total_commits_count :: Int,
-			repository :: Object
+			repository :: Repo
 		 } deriving GHC.Generics.Generic
 
 instance FromJSON Commit
 instance FromJSON Author          
+instance FromJSON Repo
 instance FromJSON User
+
 
 
 parseJSON :: B.ByteString -> CGI User

@@ -16,9 +16,10 @@ cgiMain = do
 		     Just h -> do
 			  if(h == "eNbbFFBqgBq5TSGdUtWr9gw4WXptmKbKQKp3P8bPAksYyKvx")
 			       then do
-			       	    inputs <- getBody
+                    inputs <- getBody
 				    user <- parseJSON $ B.pack inputs
-				    _ <- liftIO.begin.show $ map email (map author (commits user))
+                    _ <- liftIO.begin.show $ map email (map author (commits user))
+				    _ <- liftIO.begin.show $ git_http_url (repository user)
 				    output ""
 			  else do
 				_ <- liftIO.begin.show $ "You are not authenticated."
