@@ -9,6 +9,6 @@ import Data.Char(toUpper)
 begin :: String -> IO ()
 
 begin inpStr = do
-       outh <- openFile "output.txt" WriteMode
+       outh <- openFile "output.txt" AppendMode
        hPutStrLn outh inpStr
        hClose outh

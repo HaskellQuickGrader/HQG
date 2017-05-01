@@ -12,21 +12,25 @@ cgiMain = do
         --get header and check for secret token authorization
         header <- requestHeader "X-Gitlab-Token"
         case header of
-            Nothing -> error "Error."
+            Nothing -> error "Error no header."
             Just h -> do
             if(h == "eNbbFFBqgBq5TSGdUtWr9gw4WXptmKbKQKp3P8bPAksYyKvx")
                 then do
                     inputs <- getBody
                     user <- parseJSON $ B.pack inputs
                     _ <- liftIO.begin.show $ map email (map author (commits user))
-                    -- let url = git_http_url (repository user)
-                    -- error $ show url
-                    -- (_,outHdl,errHdl,_) <- liftIO.createProcess $ shell ("git clone "++url++" /AHG")
-                    -- case errHdl of
-                        -- Just err -> output $ show $ err
-                        -- Nothing -> case outHdl of   
-                                        -- Just message -> output $ "Cloning Repo: "++url
-                                        -- Nothing -> output ""
+                    let url = git_http_url (repository user)
+                    _ <- liftIO.begin.show $ "url: "++url
+                    (_,outhdl,errhdl,_) <- liftIO.createProcess $ shell ("git clone "++url++" /ahg")
+                    case errhdl of
+                        Just err -> do
+                            _ <- liftIO.begin $ "ERROR: "++(show err)
+                            output ""
+                        Nothing -> case outhdl of   
+                                        Just message -> do
+                                            _ <- liftIO.begin $ "cloning repo: "++(show url)
+                                            output ""
+                                        Nothing -> output ""
                     output ""
             else do
                 _ <- liftIO.begin.show $ "You are not authenticated."
