@@ -21,16 +21,14 @@ cgiMain = do
                     _ <- liftIO.begin.show $ map email (map author (commits user))
                     let url = git_http_url (repository user)
                     _ <- liftIO.begin.show $ "url: "++url
-                    (_,outhdl,errhdl,_) <- liftIO.createProcess $ shell ("git clone "++url++" /ahg")
+                    (_,_,errhdl,ph) <- liftIO.createProcess $ shell ("git clone "++url++" /AHG")
                     case errhdl of
                         Just err -> do
                             _ <- liftIO.begin $ "ERROR: "++(show err)
                             output ""
-                        Nothing -> case outhdl of   
-                                        Just message -> do
-                                            _ <- liftIO.begin $ "cloning repo: "++(show url)
-                                            output ""
-                                        Nothing -> output ""
+                        Nothing -> do
+                            _ <- liftIO.waitForProcess $ ph -- run process but wait until it completes
+                            output ""
                     output ""
             else do
                 _ <- liftIO.begin.show $ "You are not authenticated."

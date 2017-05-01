@@ -34,7 +34,7 @@ embedded Nginx web server and instead uses Apache.
 		i. sudo a2enmod rewrite
 		ii. sudo a2enmod proxy
 		iii. sudo a2enmod proxy_http
-		iv. sudo apachectl restart
+		iv. sudo apache2 restart
 	f. Currently apache has a default configuration for port 80, so we need to disable that conf file.
 	   It's usually called 000-default.conf and we disable it using the command: sudo a2dissite 000-default.conf
 	g. Open up the new gitlab configuration file, mine is called (gitlab-omnibus-apache24.conf): nano gitlab-omnibus-apache24.conf
