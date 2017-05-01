@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric, DuplicateRecordFields #-}
 
-module ParseUserInfo where
+module ParseUserInfo (Repo(..))where
     
 
 import GHC.Generics
