@@ -15,28 +15,28 @@ cgiMain = do
         case header of
             Nothing -> error "Error no header."
             Just h -> do
-            if(h == "eNbbFFBqgBq5TSGdUtWr9gw4WXptmKbKQKp3P8bPAksYyKvx")
+            if(h == "eNbbFFBqgBq5TSGdUtWr9gw4WXptmKbKQKp3P8bPAksYyKvx") -- make sure secret token is present
                 then do
-                    inputs <- getBody
+                    inputs <- getBody                                   -- Get body of reponse
                     user <- parseJSON $ B.pack inputs
                     let eName = (event_name user)
-		    _ <- liftIO.being.show $ "event_name: "++eName
-		    let cloneURL = git_http_url (repository user)
-		    if (eName == "project_create")
-		       then do
-		          _ <- liftIO.begin.show $ "clone url: "++cloneURL
-                          (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C","/usr/lib/cgi-bin/Repos",("clone "++cloneURL)] ""
-                          case eCode of
-                              ExitSuccess -> output ""
-                              _ -> do
-			          _ <- liftIO.begin.show $ stdOut
-                                  _ <- liftIO.begin.show $ stdErr
-			          output ""
+                    _ <- liftIO.being.show $ "event_name: "++eName
+                    let cloneURL = git_http_url (repository user)
+                    if (eName == "project_create")                      -- verify this is a project creation
+                        then do
+                            _ <- liftIO.begin.show $ "clone url: "++cloneURL
+                            (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C","/usr/lib/cgi-bin/Repos",("clone "++cloneURL)] ""        -- Clone newly created repo
+                            case eCode of
+                                ExitSuccess -> output ""
+                                _ -> do
+                                    _ <- liftIO.begin.show $ stdOut         -- Log any output or errors
+                                    _ <- liftIO.begin.show $ stdErr
+                                    output ""
                     else
-			output ""
-                else do
-                      _ <- liftIO.begin.show $ "You are not authenticated."
-                      output ""
+                        output ""
+            else do
+                _ <- liftIO.begin.show $ "You are not authenticated."
+                output ""
 
 main :: IO ()
 main = runCGI (handleErrors cgiMain)
