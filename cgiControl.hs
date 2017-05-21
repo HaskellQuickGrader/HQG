@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -fno-warn-tabs #-}
 import Network.CGI 
 import System.Process
+import System.Exit
 import Control.Monad.Trans.Class
 import TransferData
 import ParseUserInfo
@@ -21,15 +22,14 @@ cgiMain = do
                     _ <- liftIO.begin.show $ map email (map author (commits user))
                     let url = git_http_url (repository user)
                     _ <- liftIO.begin.show $ "url: "++url
-                    (_,_,errhdl,ph) <- liftIO.createProcess $ shell ("git clone "++url++" /AHG")
-                    case errhdl of
-                        Just err -> do
-                            _ <- liftIO.begin $ "ERROR: "++(show err)
-                            output ""
-                        Nothing -> do
-                            _ <- liftIO.waitForProcess $ ph -- run process but wait until it completes
-                            output ""
-                    output ""
+                    (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C","/usr/lib/cgi-bin/Repos/testing","pull"] ""
+                    case eCode of
+                        ExitSuccess -> output ""
+                        _ -> do
+			    _ <- liftIO.begin.show $ stdOut
+                            _ <- liftIO.begin.show $ stdErr
+			    output ""
+                    
             else do
                 _ <- liftIO.begin.show $ "You are not authenticated."
                 output ""
