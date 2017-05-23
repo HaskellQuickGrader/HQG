@@ -34,14 +34,14 @@ embedded Nginx web server and instead uses Apache.
 		i. sudo a2enmod rewrite
 		ii. sudo a2enmod proxy
 		iii. sudo a2enmod proxy_http
-		iv. sudo apache2 restart
+		iv. sudo service apache2 restart
 	f. Currently apache has a default configuration for port 80, so we need to disable that conf file.
 	   It's usually called 000-default.conf and we disable it using the command: sudo a2dissite 000-default.conf
 	g. Open up the new gitlab configuration file, mine is called (gitlab-omnibus-apache24.conf): nano gitlab-omnibus-apache24.conf
 	h. Comment out "ServerName" using "#" without the quotation marks.  This is usually the first line 
 	   in the <VirtualHost> block
-	i. Delete FQDN on line 60 ad replace it with your IP address, the line should read something like this: ProxyPassReverse http://your-IP-address-here
-	j. On lines 123, 125, 127, 129 you'll see a paths with "YOUR_SERVER_FQDN" in them.  Replace "YOUR_SERVER_FQDN" with Gitlab for
+	i. Delete FQDN add replace it with your IP address, the line should read something like this: ProxyPassReverse http://your-IP-address-here
+	j. At the end of the file you'll see a paths with "YOUR_SERVER_FQDN" in them.  Replace "YOUR_SERVER_FQDN" with Gitlab for
 	   each of those lines.  One is for the ErrorLog and the other three are CustomLogs. You don't 
 	   currently have those paths so let's go create them in the next step
 	k. You will also want to save you changes and go create the folder to collect the error logs.

@@ -20,7 +20,7 @@ cgiMain = do
                     inputs <- getBody                                   -- Get body of reponse
                     user <- parseJSON $ B.pack inputs
                     let eName = (event_name user)
-                    _ <- liftIO.being.show $ "event_name: "++eName
+                    _ <- liftIO.begin.show $ "event_name: "++eName
                     let cloneURL = git_http_url (repository user)
                     if (eName == "project_create")                      -- verify this is a project creation
                         then do
