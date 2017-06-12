@@ -22,7 +22,8 @@ embedded Nginx web server and instead uses Apache.
 			   sudo apt-get install apache2
 2. Configure gitlab to use Apache2 instead of Nginx.
 	a. Open up gitlab configuration, use command: nano /etc/gitlab/gitlab.rb
-	b. Add the following lines: nginx['enable'] = false
+    b-1. Find "external_url", after it place your IP address as a URL with single quotes around it 
+	b-2. Add the following lines: nginx['enable'] = false
 				    web_server['external_users'] = ['www-data']
 				    gitlab_rails['trusted_proxies'] = [ 'put your IP address here between the single-quotes']
 				    gitlab_workhorse['listen_network'] = "tcp"
@@ -52,12 +53,20 @@ embedded Nginx web server and instead uses Apache.
 			       mkdir logs
 	l. Enable to the gitlab config file you've made: sudo a2ensite gitlab-omnibus-apache24.conf
 	m. Configure the port you want to use for your second website. Use the command: nano /etc/apache2/ports.conf
+
+
+******************************************************************************************
+Follow these directions only if you need the apache server to run more than one website
+******************************************************************************************
 	n. You will see the on line 5 - "Listen 80". You want to add a line below that with the port you want to 
 	   use. So it will look something like this:
 		Listen 80
 		Listen 8282 
 	   In this above example I added "Listen 8282". You would replace "8282" with the port number
 	   you want to use.
+*****************************************************************************************
+
+
 	o. Restart Apache to implement the changes you made, use the command: sudo service apache2 restart
 
 - At this point your gitlab website should be up and running.  Test this be putting you IP address in
@@ -175,5 +184,15 @@ CREATING CUSTOM HOOKS:
 
 ********************************************************************************************************
 ********************************************************************************************************
+You must be using the Haskell Platform 8.0 or higher as it supports the DuplicateRecordFields extension
+- As of 6/3/2017 if you download the default Haskell Platform version for Ubuntu it is the Haskell 7.*.  Download and install the generic linux version instead.
 
--- added dependency process-1.6.0.0
+
+Dependencies:
+process-1.6.0.0
+aeson-1.2.0.0
+cgi-3001.3.0.2
+libgmp-dev
+gcc
+
+NB. If using an VM, make sure you have at least 2 GB of memory available

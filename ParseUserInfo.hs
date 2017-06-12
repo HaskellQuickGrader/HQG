@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, DuplicateRecordFields #-}
+{-# LANGUAGE DeriveGeneric, DuplicateRecordFields, OverloadedLabels #-}
 
 module ParseUserInfo (Commit(..),Author(..),Repo(..),User(..), parseJSON)where
     
