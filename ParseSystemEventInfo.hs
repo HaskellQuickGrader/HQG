@@ -13,7 +13,7 @@ import Network.CGI
 
 data SystemEvent = SystemEvent {    event_name :: String,
                                     created_at :: Object,
-                                    update_at :: Object,
+                                    updated_at :: Object,
                                     name :: Object,
                                     path :: Object,
                                     path_with_namespace :: Object,
