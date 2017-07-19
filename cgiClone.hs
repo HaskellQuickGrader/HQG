@@ -11,35 +11,41 @@ import qualified Data.ByteString.Lazy.Char8 as B
 cgiMain :: CGI CGIResult
 cgiMain = do
         --get header and check for secret token authorization
-        header <- requestHeader "X-Gitlab-Token"
-        case header of
-            Nothing -> error "Error no header."
-            Just h -> do
-            _ <- liftIO.begin.show $ h
-            output ""
-            -- if(h == "System Hook")
-            -- --if(h == "eNbbFFBqgBq5TSGdUtWr9gw4WXptmKbKQKp3P8bPAksYyKvx") -- make sure secret token is present
-                -- then do
-                    -- inputs <- getBody                                   -- Get body of reponse
-                    -- user <- parseJSON $ B.pack inputs
-                    -- let eName = (event_name user)
-                    -- _ <- liftIO.begin.show $ "event_name: "++eName
-                    -- let cloneURL = git_http_url (repository user)
-                    -- if (eName == "project_create")                      -- verify this is a project creation
-                        -- then do
-                            -- _ <- liftIO.begin.show $ "clone url: "++cloneURL
-                            -- (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C","/usr/lib/cgi-bin/Repos",("clone "++cloneURL)] ""        -- Clone newly created repo
-                            -- case eCode of
-                                -- ExitSuccess -> output ""
-                                -- _ -> do
-                                    -- _ <- liftIO.begin.show $ stdOut         -- Log any output or errors
-                                    -- _ <- liftIO.begin.show $ stdErr
-                                    -- output ""
-                    -- else
-                        -- output ""
-            -- else do
-                -- _ <- liftIO.begin.show $ "You are not authenticated."
-                -- output ""
+        headerToken <- requestHeader "X-Gitlab-Token"
+        case headerToken of
+            Nothing -> error "Error no token header."
+            Just ht -> do
+            if(ht == "eNbbFFBqgBq5TSGdUtWr9gw4WXptmKbKQKp3P8bPAksYyKvx") -- make sure secret token is present
+            -- Determine which type of event just occured
+                then do
+                    headerEvent <- requestHeader "X-Gitlab-Event"
+                    case headerEvent of
+                        Nothing -> error "Error: no event header"
+                        Just ge -> do
+                                    if(ge == "System Hook")
+                                        then do 
+                                            inputs <- getBody                                   -- Get body of reponse
+                                            user <- parseJSON $ B.pack inputs
+                                            let eName = (event_name user)
+                                            _ <- liftIO.begin.show $ "event_name: "++eName
+                                            let cloneURL = git_http_url (repository user)
+                                            if (eName == "project_create")                      -- verify this is a project creation
+                                                then do
+                                                    _ <- liftIO.begin.show $ "clone url: "++cloneURL
+                                                    (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C","/usr/lib/cgi-bin/Repos",("clone "++cloneURL)] ""        -- Clone newly created repo
+                                                    case eCode of
+                                                        ExitSuccess -> output ""
+                                                        _ -> do
+                                                            _ <- liftIO.begin.show $ stdOut         -- Log any output or errors
+                                                            _ <- liftIO.begin.show $ stdErr
+                                                            output ""
+                                            else
+                                                output ""
+                                    else 
+                                        output ""
+            else do
+                _ <- liftIO.begin.show $ "You are not authenticated."
+                output ""
 
 main :: IO ()
 main = runCGI (handleErrors cgiMain)
