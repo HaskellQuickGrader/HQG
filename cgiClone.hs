@@ -15,7 +15,8 @@ cgiMain = do
         case header of
             Nothing -> error "Error no header."
             Just h -> do
-            if(h == "eNbbFFBqgBq5TSGdUtWr9gw4WXptmKbKQKp3P8bPAksYyKvx") -- make sure secret token is present
+            if(h == "System Hook")
+            --if(h == "eNbbFFBqgBq5TSGdUtWr9gw4WXptmKbKQKp3P8bPAksYyKvx") -- make sure secret token is present
                 then do
                     inputs <- getBody                                   -- Get body of reponse
                     user <- parseJSON $ B.pack inputs

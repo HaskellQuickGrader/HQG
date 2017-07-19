@@ -23,7 +23,8 @@ embedded Nginx web server and instead uses Apache.
 2. Configure gitlab to use Apache2 instead of Nginx.
 	a. Open up gitlab configuration, use command: nano /etc/gitlab/gitlab.rb
     b-1. Find "external_url", after it place your IP address as a URL with single quotes around it 
-	b-2. Add the following lines: nginx['enable'] = false
+	b-2. Add the following lines: 
+                    nginx['enable'] = false
 				    web_server['external_users'] = ['www-data']
 				    gitlab_rails['trusted_proxies'] = [ 'put your IP address here between the single-quotes']
 				    gitlab_workhorse['listen_network'] = "tcp"
@@ -31,15 +32,7 @@ embedded Nginx web server and instead uses Apache.
 	c. For the changes to take effect run  the command: sudo gitlab-ctl reconfigure
 	d. Go download the correct apache2 configuration for gitlab found here: https://gitlab.com/gitlab-org/gitlab-recipes/tree/master/web-server/apache
 	e. Make sure you download the omnibus version, place this file in cd /etc/apache2/sites-available
-	f. We need to enable several dependencies for apache. Run the following commands.
-		i. sudo a2enmod rewrite
-		ii. sudo a2enmod proxy
-		iii. sudo a2enmod proxy_http
-		iv. sudo service apache2 restart
-	f. Currently apache has a default configuration for port 80, so we need to disable that conf file.
-	   It's usually called 000-default.conf and we disable it using the command: sudo a2dissite 000-default.conf
-	g. Open up the new gitlab configuration file, mine is called (gitlab-omnibus-apache24.conf): nano gitlab-omnibus-apache24.conf
-	h. Comment out "ServerName" using "#" without the quotation marks.  This is usually the first line 
+    h. DO NOT DO --> Comment out "ServerName" using "#" without the quotation marks.  This is usually the first line 
 	   in the <VirtualHost> block
 	i. Delete FQDN add replace it with your IP address, the line should read something like this: ProxyPassReverse http://your-IP-address-here
 	j. At the end of the file you'll see a paths with "YOUR_SERVER_FQDN" in them.  Replace "YOUR_SERVER_FQDN" with Gitlab for
@@ -51,22 +44,28 @@ embedded Nginx web server and instead uses Apache.
 			       mkdir httpd
 			       cd httpd
 			       mkdir logs
-	l. Enable to the gitlab config file you've made: sudo a2ensite gitlab-omnibus-apache24.conf
-	m. Configure the port you want to use for your second website. Use the command: nano /etc/apache2/ports.conf
-
-
-******************************************************************************************
-Follow these directions only if you need the apache server to run more than one website
-******************************************************************************************
-	n. You will see the on line 5 - "Listen 80". You want to add a line below that with the port you want to 
+    l. Navigate back to /etc/apache2/sites-available
+	l. Enable the gitlab config file you've made: sudo a2ensite gitlab-omnibus-apache24.conf
+	f. We need to enable several dependencies for apache. Run the following commands.
+		i. sudo a2enmod rewrite
+		ii. sudo a2enmod proxy
+		iii. sudo a2enmod proxy_http
+		iv. sudo service apache2 restart
+	f. Currently apache has a default configuration for port 80, so we need to disable that conf file.
+	   It's usually called 000-default.conf and we disable it using the command: 
+    f. Run: sudo service apache2 reload
+    f. Navigate to: cd /etc/apache2/mods-enabled
+    f. Run command: sudo a2enmod cgi.load (may end up enableing cgid.load instead )
+    f. Run: sudo service apache2 restart
+	g. OLD --> Open up the new gitlab configuration file, mine is called (gitlab-omnibus-apache24.conf): nano gitlab-omnibus-apache24.conf
+	
+	m. Configure the port you want to use . Use the command: nano /etc/apache2/ports.conf
+    n. You will see the on line 5 - "Listen 80". You want to add a line below that with the port you want to 
 	   use. So it will look something like this:
 		Listen 80
 		Listen 8282 
 	   In this above example I added "Listen 8282". You would replace "8282" with the port number
 	   you want to use.
-*****************************************************************************************
-
-
 	o. Restart Apache to implement the changes you made, use the command: sudo service apache2 restart
 
 - At this point your gitlab website should be up and running.  Test this be putting you IP address in
@@ -81,7 +80,7 @@ Follow these directions only if you need the apache server to run more than one 
 CONFIGURING APACHE2 TO RUN CGI PROCESSES
 
 1. Create the "cgi-bin" directory:
-	a. Navigate to /usr/bin: cd /usr/bin
+	a. Navigate to /usr/lib: cd /usr/lib
 	b. if you already have the folder /cgi-bin then you are done if not create it: mkdir cgi-bin
 2. Go into the folder you just created: cd cgi-bin
 3. Place your haskell cgi file into here
@@ -105,6 +104,10 @@ CONFIGURING APACHE2 TO RUN CGI PROCESSES
 	c. The last change is to add the port number, which you get to pick.  Add it to the first line of the file
 	   inside the Virtual Host tag: <VirtualHost *:8282>
 		- In this example 8282 is the port, change 8282 to whatever port you want
+        
+   - TODO: Add a2ensite command
+   - TODO: Add sudo service apache2 reload
+   - TODO: Add note about adding the port number to the script URL: http://ipAddress:port/cgi-bin/cgiProcessName
 
 
 
@@ -185,14 +188,26 @@ CREATING CUSTOM HOOKS:
 ********************************************************************************************************
 ********************************************************************************************************
 You must be using the Haskell Platform 8.0 or higher as it supports the DuplicateRecordFields extension
-- As of 6/3/2017 if you download the default Haskell Platform version for Ubuntu it is the Haskell 7.*.  Download and install the generic linux version instead.
+- As of 6/3/2017 if you download the default Haskell Platform version for Ubuntu it is the Haskell 7.*.  
+    Download and install the generic linux version instead.
+    - Use sudo wget https://haskell.org/platform/download/8.0.2/haskell-platform-8.0.2-unknown-posix--full-x86_64.tar.gz
+    for the current version as of 7/12/2017
+    - If using a system with position independent executables by deafult (like Ubuntu 16.10 and above), edit the GHC file at
+      usr/local/haskell/ghc-____/lib/ghc-____/settings
+      and change the "compiler supports -no-pie" flag from "NO" to "YES"
+      
+
+Haskell Dependencies:
+process or process-1.6.0.0
+aeson or aeson-1.2.0.0
+cgi or cgi-3001.3.0.2
 
 
-Dependencies:
-process-1.6.0.0
-aeson-1.2.0.0
-cgi-3001.3.0.2
-libgmp-dev
+linux dependencies:
 gcc
+libgmp-dev
+git
 
 NB. If using an VM, make sure you have at least 2 GB of memory available
+
+Make a note about adding the port to hook URL in gitlab webpage
