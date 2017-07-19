@@ -10,8 +10,10 @@ import qualified Data.ByteString.Lazy.Char8 as B
 
 cgiMain :: CGI CGIResult
 cgiMain = do
+        _ <- liftIO.begin.show $ "Clone cgi script begins"
         --get header and check for secret token authorization
         headerToken <- requestHeader "X-Gitlab-Token"
+        _ <- liftIO.begin.show $ headerToken
         case headerToken of
             Nothing -> error "Error no token header."
             Just ht -> do
