@@ -12,15 +12,15 @@ import qualified Data.ByteString.Lazy as B
 import Network.CGI 
 
 data SystemEvent = SystemEvent {    event_name :: String,
-                                    created_at :: Object,
-                                    updated_at :: Object,
-                                    name :: Object,
-                                    path :: Object,
-                                    path_with_namespace :: Object,
+                                    created_at :: String,
+                                    updated_at :: String,
+                                    name :: String,
+                                    path :: String,
+                                    path_with_namespace :: String,
                                     project_id :: Int,
-                                    owner_name :: Object,
-                                    owner_email :: Object,
-                                    project_visibility :: Object
+                                    owner_name :: String,
+                                    owner_email :: String,
+                                    project_visibility :: String
                                  } deriving (GHC.Generics.Generic, Show)
 
 instance FromJSON SystemEvent
