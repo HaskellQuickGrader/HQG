@@ -21,7 +21,7 @@ data SystemEvent = SystemEvent {    event_name :: String,
                                     owner_name :: String,
                                     owner_email :: String,
                                     project_visibility :: String
-                                 } deriving GHC.Generics.Generic
+                                 } deriving (GHC.Generics.Generic, Show)
 
 instance FromJSON SystemEvent
 
