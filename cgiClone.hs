@@ -26,23 +26,25 @@ cgiMain = do
                                         then do 
                                             inputs <- getBody                                   -- Get body of reponse
                                             systemEvent <- parseJSON $ B.pack inputs
-                                            let eName = (event_name systemEvent)
-                                            _ <- liftIO.begin.show $ "event_name: "++eName
-                                            prog <- progURI
-                                            _ <- liftIO.begin.show $ prog
-                                            --let cloneURL = git_http_url (repository systemEvent)
-                                            if (eName == "project_create")                      -- verify this is a project creation
-                                                then do
-                                                    -- _ <- liftIO.begin.show $ "clone url: "++cloneURL
-                                                    -- (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C","/usr/lib/cgi-bin/Repos",("clone "++cloneURL)] ""        -- Clone newly created repo
-                                                    -- case eCode of
-                                                        -- ExitSuccess -> output ""
-                                                        -- _ -> do
-                                                            -- _ <- liftIO.begin.show $ stdOut         -- Log any output or errors
-                                                            -- _ <- liftIO.begin.show $ stdErr
-                                                            output ""
-                                            else
-                                                output ""
+                                            _ <- liftIO.begin.show $ systemEvent
+                                            -- let eName = (event_name systemEvent)
+                                            -- _ <- liftIO.begin.show $ "event_name: "++eName
+                                            -- prog <- progURI
+                                            -- _ <- liftIO.begin.show $ prog
+                                            -- --let cloneURL = git_http_url (repository systemEvent)
+                                            -- if (eName == "project_create")                      -- verify this is a project creation
+                                                -- then do
+                                                    -- -- _ <- liftIO.begin.show $ "clone url: "++cloneURL
+                                                    -- -- (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C","/usr/lib/cgi-bin/Repos",("clone "++cloneURL)] ""        -- Clone newly created repo
+                                                    -- -- case eCode of
+                                                        -- -- ExitSuccess -> output ""
+                                                        -- -- _ -> do
+                                                            -- -- _ <- liftIO.begin.show $ stdOut         -- Log any output or errors
+                                                            -- -- _ <- liftIO.begin.show $ stdErr
+                                                            -- output ""
+                                            -- else
+                                                -- output ""
+                                            output ""
                                     else 
                                         output ""
             else do
