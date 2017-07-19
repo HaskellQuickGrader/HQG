@@ -14,15 +14,12 @@ import Network.CGI
 data SystemEvent = SystemEvent {    event_name :: String,
                                     created_at :: String,
                                     update_at :: String,
-                                    project_name :: String,
-                                    project_path :: String,
-                                    project_path_with_namespace :: String,
+                                    name :: String,
+                                    path :: String,
+                                    path_with_namespace :: String,
                                     project_id :: Int,
-                                    user_username :: String,
-                                    user_name :: String,
-                                    user_email :: String,
-                                    user_id :: Int,
-                                    access_level :: String,
+                                    owner_name :: String,
+                                    owner_email :: String,
                                     project_visibility :: String
                                  } deriving GHC.Generics.Generic
 
