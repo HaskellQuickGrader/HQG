@@ -8,6 +8,13 @@ import ParseSystemEventInfo
 import qualified Data.ByteString.Lazy.Char8 as B
 
 
+getDomainFromURI :: String -> String
+getDomainFromURI [] = []
+getDomainFromURI (x:xs) = if (x == ':')
+                            then []
+                            else x:getDomainFromURI xs
+
+
 cgiMain :: CGI CGIResult
 cgiMain = do
         --get header and check for secret token authorization
@@ -27,11 +34,12 @@ cgiMain = do
                                             inputs <- getBody                                   -- Get body of reponse
                                             systemEvent <- parseJSON $ B.pack inputs
                                             let pathNameSpace = (path_with_namespace systemEvent)
-                                            _ <- liftIO.begin.show $ pathNameSpace
+                                            _ <- liftIO.begin.show $ "path with namespace: "++pathNameSpace
                                             let eName = (event_name systemEvent)
                                             _ <- liftIO.begin.show $ "event_name: "++eName
-                                            prog <- progURI
-                                            _ <- liftIO.begin.show $ prog
+                                            uri <- progURI
+                                            let domain = getDomainFromURI $ show uri
+                                            _ <- liftIO.begin.show $ "domain: "++domain
                                             -- --let cloneURL = git_http_url (repository systemEvent)
                                             -- if (eName == "project_create")                      -- verify this is a project creation
                                                 -- then do
