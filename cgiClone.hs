@@ -45,18 +45,19 @@ cgiMain = do
                                             _ <- liftIO.begin.show $ "domain: "++domain
                                             let cloneURL = domain++"/"++pathNameSpace++".git"
                                             _ <- liftIO.begin.show $ cloneURL
-                                            -- if (eName == "project_create")                      -- verify this is a project creation
-                                                -- then do
-                                                    -- -- _ <- liftIO.begin.show $ "clone url: "++cloneURL
-                                                    -- -- (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C","/usr/lib/cgi-bin/Repos",("clone "++cloneURL)] ""        -- Clone newly created repo
-                                                    -- -- case eCode of
-                                                        -- -- ExitSuccess -> output ""
-                                                        -- -- _ -> do
-                                                            -- -- _ <- liftIO.begin.show $ stdOut         -- Log any output or errors
-                                                            -- -- _ <- liftIO.begin.show $ stdErr
-                                                            -- output ""
-                                            -- else
-                                                -- output ""
+                                            if (eName == "project_create")                      -- verify this is a project creation
+                                                then do
+                                                    (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C","/usr/lib/cgi-bin/Repos",("clone "++cloneURL)] ""        -- Clone newly created repo
+                                                    case eCode of
+                                                        ExitSuccess -> output ""
+                                                        _ -> do
+                                                            _ <- liftIO.begin.show $ stdOut         -- Log any output or errors
+                                                            _ <- liftIO.begin.show $ stdErr
+                                                            output ""
+                                                else
+                                                    do
+                                                    _ <- liftIO.begin.show $ "Event name not project_create"
+                                                    output ""
                                             output ""
                                     else 
                                         output ""
