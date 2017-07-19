@@ -43,7 +43,8 @@ cgiMain = do
                                             uri <- progURI
                                             let domain = getDomainFromURI (show uri) 0
                                             _ <- liftIO.begin.show $ "domain: "++domain
-                                            -- --let cloneURL = git_http_url (repository systemEvent)
+                                            let cloneURL = domain++"/"++pathNameSpace++".git"
+                                            _ <- liftIO.begin.show $ cloneURL
                                             -- if (eName == "project_create")                      -- verify this is a project creation
                                                 -- then do
                                                     -- -- _ <- liftIO.begin.show $ "clone url: "++cloneURL
