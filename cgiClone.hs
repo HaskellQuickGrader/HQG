@@ -26,13 +26,12 @@ cgiMain = do
                                         then do 
                                             inputs <- getBody                                   -- Get body of reponse
                                             systemEvent <- parseJSON $ B.pack inputs
-					    _ <- liftIO.begin.show $ systemEvent
-                                            let n = (name systemEvent)
-                                            _ <- liftIO.begin.show $ n
-                                            -- let eName = (event_name systemEvent)
-                                            -- _ <- liftIO.begin.show $ "event_name: "++eName
-                                            -- prog <- progURI
-                                            -- _ <- liftIO.begin.show $ prog
+                                            let pathNameSpace = (path_with_namespace systemEvent)
+                                            _ <- liftIO.begin.show $ pathNameSpace
+                                            let eName = (event_name systemEvent)
+                                            _ <- liftIO.begin.show $ "event_name: "++eName
+                                            prog <- progURI
+                                            _ <- liftIO.begin.show $ prog
                                             -- --let cloneURL = git_http_url (repository systemEvent)
                                             -- if (eName == "project_create")                      -- verify this is a project creation
                                                 -- then do
