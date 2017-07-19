@@ -1,0 +1,11 @@
+"{\"event_name\":\"project_create\",
+\"created_at\":\"2017-07-19T03:55:15Z\",
+\"updated_at\":\"2017-07-19T03:55:15Z\",
+\"name\":\"Creation_Test\",
+\"path\":\"Creation_Test\",
+\"path_with_namespace\":\"root/Creation_Test\",
+\"project_id\":19,
+\"owner_name\":\"Administrator\",
+\"owner_email\":\"admin@example.com\",
+\"project_visibility\":\"visibilitylevel|private\"}"
+

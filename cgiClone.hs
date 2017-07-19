@@ -25,8 +25,10 @@ cgiMain = do
                                     if(ge == "System Hook")
                                         then do 
                                             inputs <- getBody                                   -- Get body of reponse
+					    _ <- liftIO.begin.show $ inputs
                                             systemEvent <- parseJSON $ B.pack inputs
-                                            _ <- liftIO.begin.show $ systemEvent
+					    let n = (name systemEvent)
+                                            _ <- liftIO.begin.show $ n
                                             -- let eName = (event_name systemEvent)
                                             -- _ <- liftIO.begin.show $ "event_name: "++eName
                                             -- prog <- progURI

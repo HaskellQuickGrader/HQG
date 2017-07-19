@@ -11,13 +11,13 @@ import qualified Data.ByteString.Lazy as B
 
 import Network.CGI 
 
-data SystemEvent = SystemEvent {    event_name :: Object,
+data SystemEvent = SystemEvent {    event_name :: String,
                                     created_at :: Object,
                                     update_at :: Object,
                                     name :: Object,
                                     path :: Object,
                                     path_with_namespace :: Object,
-                                    project_id :: Object,
+                                    project_id :: Int,
                                     owner_name :: Object,
                                     owner_email :: Object,
                                     project_visibility :: Object
