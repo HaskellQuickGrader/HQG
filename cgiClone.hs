@@ -49,5 +49,6 @@ cgiMain = do
                 _ <- liftIO.begin.show $ "You are not authenticated."
                 output ""
 
+                
 main :: IO ()
 main = runCGI (handleErrors cgiMain)
