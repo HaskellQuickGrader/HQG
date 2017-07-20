@@ -8,17 +8,15 @@ import ParseSystemEventInfo
 import qualified Data.ByteString.Lazy.Char8 as B
 
 
-getDomainFromURI :: String -> Int -> String
-getDomainFromURI [] count = []
-getDomainFromURI (x:xs) count | x == ':' = 
-                                    then if (count == 1)
-                                            then []
-                                            else x:getDomainFromURI xs 1
-                                    else
-					if(count == 0)
-					  then 
-                                        x:getDomainFromURI xs count
-
+composeCloneURL :: String -> Int -> Int -> String
+composeCloneURL [] countColon countSlash= []
+composeCloneURL (x:xs) countColon countSlash | x == ':' = if (countColon == 1)
+                                                            then []     -- Reached the port number
+                                                            else x:composeCloneURL xs (countColon +1) countSlash
+                                             | x == '/' = if(countSlash == 1)   -- Need to add gitlab username and password
+                                                            then x:"root:password@"++composeCloneURL xs countColon 2
+                                                            else x:composeCloneURL xs countColon (countSlash+1)
+                                             | otherwise = x:composeCloneURL xs countColon countSlash
 
 cgiMain :: CGI CGIResult
 cgiMain = do
@@ -41,7 +39,7 @@ cgiMain = do
                                             let pathNameSpace = (path_with_namespace systemEvent)
                                             let eName = (event_name systemEvent)
                                             uri <- progURI
-                                            let domain = getDomainFromURI (show uri) 0
+                                            let domain = composeCloneURL (show uri) 0 0
                                             let cloneURL = domain++"/"++pathNameSpace++".git"
 					    let cloneCmd = "clone "++cloneURL
                                             if (eName == "project_create")                      -- verify this is a project creation

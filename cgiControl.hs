@@ -21,7 +21,7 @@ cgiMain = do
                     user <- parseJSON $ B.pack inputs
                     _ <- liftIO.begin.show $ map email (map author (commits user))
                     let url = git_http_url (repository user)
-		    let repoName = name (repository user)
+                    let repoName = name (repository user)
                     _ <- liftIO.begin.show $ "url: "++url
                     (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C",("/usr/lib/cgi-bin/Repos/"++repoName),"pull"] ""
                     case eCode of
