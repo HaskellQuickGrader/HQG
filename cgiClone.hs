@@ -10,11 +10,13 @@ import qualified Data.ByteString.Lazy.Char8 as B
 
 getDomainFromURI :: String -> Int -> String
 getDomainFromURI [] count = []
-getDomainFromURI (x:xs) count = if (x == ':')
+getDomainFromURI (x:xs) count | x == ':' = 
                                     then if (count == 1)
                                             then []
                                             else x:getDomainFromURI xs 1
-                                    else 
+                                    else
+					if(count == 0)
+					  then 
                                         x:getDomainFromURI xs count
 
 
@@ -37,17 +39,15 @@ cgiMain = do
                                             inputs <- getBody                                   -- Get body of reponse
                                             systemEvent <- parseJSON $ B.pack inputs
                                             let pathNameSpace = (path_with_namespace systemEvent)
-                                            _ <- liftIO.begin.show $ "path with namespace: "++pathNameSpace
                                             let eName = (event_name systemEvent)
-                                            _ <- liftIO.begin.show $ "event_name: "++eName
                                             uri <- progURI
                                             let domain = getDomainFromURI (show uri) 0
-                                            _ <- liftIO.begin.show $ "domain: "++domain
                                             let cloneURL = domain++"/"++pathNameSpace++".git"
-                                            _ <- liftIO.begin.show $ cloneURL
+					    let cloneCmd = "clone "++cloneURL
                                             if (eName == "project_create")                      -- verify this is a project creation
                                                 then do
-                                                    (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C","/usr/lib/cgi-bin/Repos",("clone "++cloneURL)] ""        -- Clone newly created repo
+						    _ <- liftIO.begin.show $ "clone command: "++cloneCmd
+                                                    (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C","/usr/lib/cgi-bin/Repos","clone", cloneURL] ""        -- Clone newly created repo
                                                     case eCode of
                                                         ExitSuccess -> output ""
                                                         _ -> do
