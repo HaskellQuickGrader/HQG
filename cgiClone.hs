@@ -8,12 +8,20 @@ import ParseSystemEventInfo
 import qualified Data.ByteString.Lazy.Char8 as B
 
 
-composeSSHURL :: String -> Int -> String
-composeSSHURL [] countSlash= []
-composeSSHURL (x:xs) countSlash | x == '/' = if(countSlash == 1)   -- Need to add gitlab username and password
-                                                            then "git@"++xs
-                                                            else x:composeSSHURL xs (countSlash+1)
-                                             | otherwise = x:composeSSHURL xs countSlash
+composeSSHURL :: String -> String -> String
+composeSSHURL url path = "git@"++(getDomainName url 0)++"/"++path
+                                             
+getDomainName :: String -> Int -> String
+getDomainName [] countSlash  = []
+getDomainName (x:xs) countSlash  | x == '/' = if(countSlash == 2)
+                                                then trimDomainName xs
+                                                else getDomainName xs (countSlash + 1)
+                                 | otherwise = getDomainName xs countSlash
+                                         
+trimDomainName :: String -> String
+trimDomainName [] = []
+trimDomainName (x:xs) | x == ':' = []
+                      | otherwise = x:trimDomainName xs
 
 cgiMain :: CGI CGIResult
 cgiMain = do
@@ -36,7 +44,7 @@ cgiMain = do
                                             let pathNameSpace = (path_with_namespace systemEvent)
                                             let eName = (event_name systemEvent)
                                             uri <- progURI
-                                            let sshURL = composeSSHURL (show uri) 0
+                                            let sshURL = composeSSHURL (show uri) pathNameSpace
                                             if (eName == "project_create")                      -- verify this is a project creation
                                                 then do
                                                     _ <- liftIO.begin.show $ "ssh url: "++sshURL
