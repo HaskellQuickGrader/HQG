@@ -211,3 +211,7 @@ git
 NB. If using an VM, make sure you have at least 2 GB of memory available
 
 Make a note about adding the port to hook URL in gitlab webpage
+
+Make note about setting www-data as the user
+
+Include directions for setting up SSH, found here: https://docs.gitlab.com/ce/ssh/README.html
