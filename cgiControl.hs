@@ -11,7 +11,7 @@ import qualified Data.ByteString.Lazy.Char8 as B
 getRepoName :: String -> Int -> String
 getRepoName [] countSlash = []
 getRepoName (x:xs) countSlash | x == '/' = if(countSlash == 3)
-                                                then xs
+                                                then "git@"++xs
                                                 else getRepoName xs (countSlash + 1)
                               | otherwise = getRepoName xs countSlash
 
