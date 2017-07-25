@@ -10,7 +10,7 @@ import qualified Data.ByteString.Lazy.Char8 as B
 -- Hack to get repo name
 getRepoName :: String -> Int -> String
 getRepoName [] countSlash = []
-getRepoName (x:xs) countSlash | x == '/' = if(countSlash == 2)
+getRepoName (x:xs) countSlash | x == '/' = if(countSlash == 3)
                                                 then xs
                                                 else getRepoName xs (countSlash + 1)
                               | otherwise = getRepoName xs countSlash
