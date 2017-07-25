@@ -8,15 +8,12 @@ import ParseSystemEventInfo
 import qualified Data.ByteString.Lazy.Char8 as B
 
 
-composeCloneURL :: String -> Int -> Int -> String
-composeCloneURL [] countColon countSlash= []
-composeCloneURL (x:xs) countColon countSlash | x == ':' = if (countColon == 1)
-                                                            then []     -- Reached the port number
-                                                            else x:composeCloneURL xs (countColon +1) countSlash
-                                             | x == '/' = if(countSlash == 1)   -- Need to add gitlab username and password
-                                                            then x:"root:password@"++composeCloneURL xs countColon 2
-                                                            else x:composeCloneURL xs countColon (countSlash+1)
-                                             | otherwise = x:composeCloneURL xs countColon countSlash
+composeSSHURL :: String -> Int -> String
+composeSSHURL [] countSlash= []
+composeSSHURL (x:xs) countSlash | x == '/' = if(countSlash == 1)   -- Need to add gitlab username and password
+                                                            then "git@"++xs
+                                                            else x:composeSSHURL xs (countSlash+1)
+                                             | otherwise = x:composeSSHURL xs countSlash
 
 cgiMain :: CGI CGIResult
 cgiMain = do
@@ -39,13 +36,11 @@ cgiMain = do
                                             let pathNameSpace = (path_with_namespace systemEvent)
                                             let eName = (event_name systemEvent)
                                             uri <- progURI
-                                            let domain = composeCloneURL (show uri) 0 0
-                                            let cloneURL = domain++"/"++pathNameSpace++".git"
-					    let cloneCmd = "clone "++cloneURL
+                                            let sshURL = composeSSHURL (show uri) 0
                                             if (eName == "project_create")                      -- verify this is a project creation
                                                 then do
-						    _ <- liftIO.begin.show $ "clone command: "++cloneCmd
-                                                    (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C","/usr/lib/cgi-bin/Repos","clone", cloneURL] ""        -- Clone newly created repo
+                                                    _ <- liftIO.begin.show $ "ssh url: "++sshURL
+                                                    (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C","/usr/lib/cgi-bin/Repos","clone", sshURL] ""        -- Clone newly created repo
                                                     case eCode of
                                                         ExitSuccess -> output ""
                                                         _ -> do
