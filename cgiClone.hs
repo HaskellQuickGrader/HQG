@@ -9,12 +9,12 @@ import qualified Data.ByteString.Lazy.Char8 as B
 
 
 composeSSHURL :: String -> String -> String
-composeSSHURL url path = "git@"++(getDomainName url 0)++"/"++path
+composeSSHURL url path = (getDomainName url 0)++":"++path++".git"
                                              
 getDomainName :: String -> Int -> String
 getDomainName [] countSlash  = []
-getDomainName (x:xs) countSlash  | x == '/' = if(countSlash == 2)
-                                                then trimDomainName xs
+getDomainName (x:xs) countSlash  | x == '/' = if(countSlash == 1)
+                                                then "git@"++trimDomainName xs
                                                 else getDomainName xs (countSlash + 1)
                                  | otherwise = getDomainName xs countSlash
                                          
@@ -44,6 +44,7 @@ cgiMain = do
                                             let pathNameSpace = (path_with_namespace systemEvent)
                                             let eName = (event_name systemEvent)
                                             uri <- progURI
+					    _ <- liftIO.begin.show $ "URI: "++(show uri)
                                             let sshURL = composeSSHURL (show uri) pathNameSpace
                                             if (eName == "project_create")                      -- verify this is a project creation
                                                 then do
