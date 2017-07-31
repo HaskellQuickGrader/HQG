@@ -1,13 +1,16 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 {- Homework 1 Tests -}
-module Hwk1Tests where
+module Hwk1Tests (tests, Test) where
 
 import Test.QuickCheck
-import AHG
 
 import Prelude hiding (all, foldr)
 import Hwk1
+
+-- Type of tests: Double is the point value, and Property is the actual
+-- test case.
+type Test = (Double, Property)
 
 test1 :: Test 
 test1 = (5 , property appendProp)

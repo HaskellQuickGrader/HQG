@@ -192,7 +192,7 @@ You must be using the Haskell Platform 8.0 or higher as it supports the Duplicat
     Download and install the generic linux version instead.
     - Use sudo wget https://haskell.org/platform/download/8.0.2/haskell-platform-8.0.2-unknown-posix--full-x86_64.tar.gz
     for the current version as of 7/12/2017
-    - If using a system with position independent executables by deafult (like Ubuntu 16.10 and above), edit the GHC file at
+    - If using a system with position independent executables by default (like Ubuntu 16.10 and above), edit the GHC file at
       usr/local/haskell/ghc-____/lib/ghc-____/settings
       and change the "compiler supports -no-pie" flag from "NO" to "YES"
       
@@ -215,3 +215,6 @@ Make a note about adding the port to hook URL in gitlab webpage
 Make note about setting www-data as the user
 
 Include directions for setting up SSH, found here: https://docs.gitlab.com/ce/ssh/README.html
+    - ssh -T git@example.com, replace "example.com" with IP address, should see welcome message
+    - ssh keys needs to go in /var/www/.ssh
+    - Changed sshd_config: PermitEmptyPasswords to yes
