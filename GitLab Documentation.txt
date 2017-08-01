@@ -217,4 +217,3 @@ Make note about setting www-data as the user
 Include directions for setting up SSH, found here: https://docs.gitlab.com/ce/ssh/README.html
     - ssh -T git@example.com, replace "example.com" with IP address, should see welcome message
     - ssh keys needs to go in /var/www/.ssh
-    - Changed sshd_config: PermitEmptyPasswords to yes
