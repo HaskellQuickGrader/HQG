@@ -1,7 +1,7 @@
 import Control.Monad
 import Test.QuickCheck
 
-import Hwk{{HwkNum}}.Hwk{{HwkNum}}Tests
+import Hwk1.Hwk1Tests
 import GradeReport
 
 
@@ -18,7 +18,7 @@ checkFolder = undefined
 makeGradeReport :: IO ()
 makeGradeReport = do
     report <- gradeHomework
-    writeToReport (show report) ("Hwk{{HwkNum}}")
+    writeToReport (show report) ("Hwk1")
     
 
 -- The double in the return type is the total score, and the list of

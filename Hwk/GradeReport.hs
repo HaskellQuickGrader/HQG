@@ -6,8 +6,8 @@ import Data.Char(toUpper)
 
 
 
-writeToReport :: String -> IO ()
-writeToReport inpStr = do
-       outh <- openFile "GradeReport.txt" AppendMode
+writeToReport :: String -> String -> IO ()
+writeToReport inpStr folder= do
+       outh <- openFile (folder++"\\GradeReport.txt") AppendMode
        hPutStrLn outh inpStr
        hClose outh

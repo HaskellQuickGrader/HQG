@@ -1,2 +1,10 @@
 /example-hwk/hwk1/#Hwk1Tests.hs#
 /example-hwk/hwk1/.#Hwk1Tests.hs
+/Hwk/*.hi
+/Hwk/*.o
+/Hwk/*.exe
+/Hwk/*.txt
+/Hwk/Hwk1/*.hi
+/Hwk/Hwk1/*.o
+/Hwk/Hwk1/*.exe
+/Hwk/Hwk1/*.txt
