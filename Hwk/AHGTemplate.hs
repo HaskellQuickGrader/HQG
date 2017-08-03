@@ -1,9 +1,7 @@
-module Hwk.AHG where
-
 import Control.Monad
 import Test.QuickCheck
 
-import Hwk1.Hwk1Tests
+import Hwk{{HwkNum}}.Hwk{{HwkNum}}Tests
 import GradeReport
 
 
@@ -19,8 +17,9 @@ checkFolder = undefined
 
 makeGradeReport :: IO ()
 makeGradeReport = do
-    report <- gradeHomework
-    writeToReport $ show report
+    (grade, results) <- gradeHomework
+    let folder = "Hwk{{HwkNum}}"
+    makeReport (show grade) results folder
     
 
 -- The double in the return type is the total score, and the list of
@@ -47,5 +46,4 @@ runQuickCheck test@(points, prop) = do
         _ -> undefined
         
 main = do
-    
-    undefined
+    makeGradeReport

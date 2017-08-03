@@ -6,36 +6,36 @@ import System.Process
 import Control.Monad
 import System.Exit
 
+-- command line arguments must follow this order:
+-- First argument is the Homework Number
+-- Second argument is the path to the student's homework repo folder, this is used
+-- for copying the grade report into that folder, which is then added to their repo for them to see
 main = do
-    args@(x:xs) <- getArgs
-    -- let hwkNum = if(length args == 1)
-                    -- then read x :: Int
-                    -- else error "Only 1 command line argument allowed"
+    args@(x:y:xs) <- getArgs
     let ahgHwk = "AHG_Hwk"++x++".hs"
-    let ahgExe = "AHG_Hwk"++x++".exe"
-    exists <- doesFileExist ahgExe
+    let ahgHwkExe = "AHG_Hwk"++x++".exe"
+    exists <- doesFileExist ahgHwkExe
     if(exists)
-        then runExe ahgExe x
+        then runExe ahgHwkExe
         else do
               makeAHG x ahgHwk
               makeExe ahgHwk
-              runExe ahgExe x
+              runExe ahgHwkExe
     
 makeAHG :: String -> String -> IO ()
 makeAHG hwkNum  ahgHwk = do
-    readHandle <- openFile "AHG.hs" ReadMode
+    readHandle <- openFile "AHGTemplate.hs" ReadMode
     writeHandle <- openFile ahgHwk WriteMode
     contents <- hGetContents readHandle
-    --let f = replace "{{HwkNum}}" x
-    -- hGetContents readHandle >>=(\contents -> interact f contents)
     let newLine = replace "{{HwkNum}}" hwkNum contents
     hPutStrLn writeHandle newLine
     hClose writeHandle
     hClose readHandle
 
-runExe :: String -> String -> IO ()
-runExe ahgExe arg = do 
-                (exitCode,stdOut,stdErr) <- readProcessWithExitCode ("C:\\Development\\AHG\\Hwk\\"++ahgExe) [arg] ""
+runExe :: String -> IO ()
+runExe ahgHwkExe = do 
+                currentDir <- getCurrentDirectory
+                (exitCode,stdOut,stdErr) <- readProcessWithExitCode (currentDir++"\\"++ahgHwkExe) [] ""
                 case exitCode of
                     ExitSuccess -> return ()
                     _ -> error $ show stdOut
@@ -45,6 +45,6 @@ makeExe file = do
                 (exitCode,stdOut,stdErr) <- readProcessWithExitCode ("ghc") ["--make",file] ""
                 case exitCode of
                     ExitSuccess -> return ()
-                    _ -> error $ show stdOut
-    
--- main = getContents >>= putStr . replace "sourceString" "destinationString"
+                    _ -> do
+                        print stdOut
+                        print stdErr
