@@ -16,11 +16,11 @@ main = do
     let ahgHwkExe = "AHG_Hwk"++x++".exe"
     exists <- doesFileExist ahgHwkExe
     if(exists)
-        then runExe ahgHwkExe
+        then runExe ahgHwkExe y
         else do
               makeAHG x ahgHwk
               makeExe ahgHwk
-              runExe ahgHwkExe
+              runExe ahgHwkExe y
     
 makeAHG :: String -> String -> IO ()
 makeAHG hwkNum  ahgHwk = do
@@ -32,13 +32,15 @@ makeAHG hwkNum  ahgHwk = do
     hClose writeHandle
     hClose readHandle
 
-runExe :: String -> IO ()
-runExe ahgHwkExe = do 
+runExe :: String -> String -> IO ()
+runExe ahgHwkExe repoDir = do 
                 currentDir <- getCurrentDirectory
-                (exitCode,stdOut,stdErr) <- readProcessWithExitCode (currentDir++"\\"++ahgHwkExe) [] ""
+                (exitCode,stdOut,stdErr) <- readProcessWithExitCode (currentDir++"\\"++ahgHwkExe) [repoDir] ""
                 case exitCode of
                     ExitSuccess -> return ()
-                    _ -> error $ show stdOut
+                    _ -> do
+                            print stdOut
+                            print stdErr
                     
 makeExe :: String -> IO ()
 makeExe file = do 

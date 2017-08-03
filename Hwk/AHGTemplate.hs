@@ -1,7 +1,9 @@
-import Control.Monad
+--import Control.Monad
 import Test.QuickCheck
+import System.Directory
+import System.Environment
 
-import Hwk{{HwkNum}}.Hwk{{HwkNum}}Tests
+import Hwk{{HwkNum}}.Hwk{{HwkNum}}Tests  --Hwk1.Hwk1Tests
 import GradeReport
 
 
@@ -11,15 +13,25 @@ import GradeReport
 -- Make grade report and copy it back to student's report
 -- Delete student's solution and grade report in Hwk1 folder to ready it for next student
 
-checkFolder :: IO ()
-checkFolder = undefined
+clearFolder :: String -> String -> IO ()
+clearFolder solutionName reportFolder = do
+    let reportPath = reportFolder++"\\GradeReport.txt"
+    let solutionPath = reportFolder++"\\"++solutionName++".hs"
+    reportExists <- doesFileExist reportPath
+    solutionExists <- doesFileExist solutionPath
+    if(reportExists)
+     then removeFile $ reportFolder++"\\GradeReport.txt"
+     else return ()
+    if(solutionExists)
+     then removeFile solutionPath
+     else return ()
 
 
-makeGradeReport :: IO ()
-makeGradeReport = do
+makeGradeReport :: String -> IO ()
+makeGradeReport folder = do
     (grade, results) <- gradeHomework
-    let folder = "Hwk{{HwkNum}}"
     makeReport (show grade) results folder
+    
     
 
 -- The double in the return type is the total score, and the list of
@@ -30,7 +42,7 @@ gradeHomework = runTests tests 0.0 []
   
 runTests :: [Test] -> Double -> [Result] -> IO (Double, [Result])
 runTests [] totalPts results = return (totalPts,results) -- runQuickCheck prop points
-runTests (test:tests) totalPts results= do
+runTests (test:tests) totalPts results = do
     (pts, result) <- runQuickCheck test
     runTests tests (pts + totalPts) (result:results)
             
@@ -45,5 +57,19 @@ runQuickCheck test@(points, prop) = do
         failure@(Failure numTests _ _ _ _ usedSize reason _ labels output failingTestCase) -> return (0.0, failure)
         _ -> undefined
         
+moveReportToRepo :: String -> String -> IO ()
+moveReportToRepo repoDir currentDir = copyFile (currentDir++"\\GradeReport.txt") (repoDir++"\\GradeReport.txt")
+
+moveSolutionFromRepo :: String -> String -> IO ()
+moveSolutionFromRepo solutionRepoPath solutionWorkingPath = copyFile solutionRepoPath solutionWorkingPath
+        
 main = do
-    makeGradeReport
+    (x:xs) <- getArgs
+    let reportFolder = "Hwk{{HwkNum}}"  -- Report folder and student's solution file have same name
+    currentDir <- getCurrentDirectory
+    let reportFolderPath = currentDir++"\\"++reportFolder
+    clearFolder reportFolder reportFolderPath
+    moveSolutionFromRepo (x++"\\"++reportFolder++".hs") (reportFolderPath++"\\"++reportFolder++".hs")
+    makeGradeReport reportFolder
+    moveReportToRepo x reportFolderPath
+    clearFolder reportFolder reportFolderPath
