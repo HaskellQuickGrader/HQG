@@ -26,7 +26,8 @@ cgiMain = do
                 then do
                     inputs <- getBody
                     user <- parseJSON $ B.pack inputs
-                    _ <- liftIO.begin.show $ user
+                    let branch = getBranchName (ref user) 0
+                    _ <- liftIO.begin.show $ "Branch name: "++branch
                     _ <- liftIO.begin.show $ map email (map author (commits user))
                     let url = git_http_url (repository user)
                     let repoName = getRepoName (homepage (repository user)) 0
@@ -42,6 +43,14 @@ cgiMain = do
             else do
                 _ <- liftIO.begin.show $ "You are not authenticated."
                 output ""
+                
+                
+getBranchName :: String -> Int -> String
+getBranchName (x:xs) slashCount | x == '/' = if (slashCount == 2)
+                                                then xs
+                                                else getBranchName xs (slashCount + 1)
+                                | otherwise = getBranchName xs (slashCount)
+                                
 
 main :: IO ()
 main = runCGI (handleErrors cgiMain)
