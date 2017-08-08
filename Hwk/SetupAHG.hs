@@ -16,6 +16,7 @@ main = do
     let ahgHwkExe = "./AHG_Hwk"++x
     -- let ahgHwkExe = "AHG_Hwk"++x++".exe" for Windows useage
     exists <- doesFileExist ahgHwkExe
+    getStudentHwk y
     if(exists)
         then runExe ahgHwkExe y
         else do
@@ -49,5 +50,10 @@ makeExe file = do
                 case exitCode of
                     ExitSuccess -> return ()
                     _ -> do
-                        print stdOut
-                        print stdErr
+                        error $"Standard out: "++ stdOut++ "   Standard error: "++stdErr
+                        
+                        
+getStudentHwk :: String -> IO ()
+getStudentHwk repoFolder = do
+    currentDir <- getCurrentDirectory
+    copyFile (repoFolder++"\\Hwk1") $ currentDir++"\\Hwk1"
