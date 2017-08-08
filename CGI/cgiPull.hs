@@ -27,19 +27,31 @@ cgiMain = do
                     inputs <- getBody
                     user <- parseJSON $ B.pack inputs
                     let branch = getBranchName (ref user) 0
-                    _ <- liftIO.begin.show $ "Branch name: "++branch
-                    _ <- liftIO.begin.show $ map email (map author (commits user))
+                    _ <- liftIO.begin.show $ "Pulling on branch name: "++branch
                     let url = git_http_url (repository user)
                     let repoName = getRepoName (homepage (repository user)) 0
-                    _ <- liftIO.begin.show $ "url: "++url
-                    (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C",("/usr/lib/cgi-bin/Repos/"++repoName),"pull"] ""
-                    case eCode of
-                        ExitSuccess -> output ""
-                        _ -> do
-                            _ <- liftIO.begin.show $ stdOut
-                            _ <- liftIO.begin.show $ stdErr
-			    output ""
-                    
+                    let hwkNum = parseHwkNum repoName
+                    _ <- liftIO.begin.show $ "Homework number: "++hwkNum
+                    let repoFolder = "/usr/lib/cgi-bin/Repos/Hwk_1"
+                    if(branch == "solution")    -- only pull and grade on "solution" branch
+                      then do 
+                            (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C",("/usr/lib/cgi-bin/Repos/"++repoName),"pull"] ""
+                            case eCode of
+                                ExitSuccess -> do
+                                                (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/lib/cgi-bin/AHG/Hwk" ["SetupAHG.exe", hwkNum, repoFolder] ""
+                                                case extCode of
+                                                    ExitSuccess -> do 
+                                                                    _ <- liftIO.begin.show $ "Finished grading homework"
+                                                                    output ""
+                                                    _ -> do
+                                                            _ <- liftIO.begin.show $ stdOut
+                                                            _ <- liftIO.begin.show $ stdErr
+                                                            output ""
+                                _ -> do
+                                    _ <- liftIO.begin.show $ stdOut
+                                    _ <- liftIO.begin.show $ stdErr
+                                    output ""
+                      else output ""
             else do
                 _ <- liftIO.begin.show $ "You are not authenticated."
                 output ""
@@ -51,6 +63,12 @@ getBranchName (x:xs) slashCount | x == '/' = if (slashCount == 2)
                                                 then xs
                                                 else getBranchName xs (slashCount + 1)
                                 | otherwise = getBranchName xs (slashCount)
+                                
+parseHwkNum :: String -> String
+parseHwkNum [] = []
+parseHwkNum (x:xs) = if (x == '_')
+                        then xs
+                        else parseHwkNum xs
                                 
 
 main :: IO ()
