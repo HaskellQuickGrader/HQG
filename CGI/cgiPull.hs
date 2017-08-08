@@ -38,7 +38,7 @@ cgiMain = do
                             (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C",("/usr/lib/cgi-bin/Repos/"++repoName),"pull"] ""
                             case eCode of
                                 ExitSuccess -> do
-                                                (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/lib/cgi-bin/AHG/Hwk" ["SetupAHG.exe", hwkNum, repoFolder] ""
+                                                (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/lib/cgi-bin/AHG/Hwk" ["./SetupAHG", hwkNum, repoFolder] ""
                                                 case extCode of
                                                     ExitSuccess -> do 
                                                                     _ <- liftIO.begin.show $ "Finished grading homework"

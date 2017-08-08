@@ -13,7 +13,8 @@ import System.Exit
 main = do
     args@(x:y:xs) <- getArgs
     let ahgHwk = "AHG_Hwk"++x++".hs"
-    let ahgHwkExe = "AHG_Hwk"++x++".exe"
+    let ahgHwkExe = "./AHG_Hwk"++x++
+    -- let ahgHwkExe = "AHG_Hwk"++x++".exe" for Windows useage
     exists <- doesFileExist ahgHwkExe
     if(exists)
         then runExe ahgHwkExe y

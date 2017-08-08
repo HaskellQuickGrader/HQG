@@ -201,6 +201,7 @@ Haskell Dependencies:
 process or process-1.6.0.0
 aeson or aeson-1.2.0.0
 cgi or cgi-3001.3.0.2
+MissingH
 
 
 linux dependencies:
@@ -217,3 +218,5 @@ Make note about setting www-data as the user
 Include directions for setting up SSH, found here: https://docs.gitlab.com/ce/ssh/README.html
     - ssh -T git@example.com, replace "example.com" with IP address, should see welcome message
     - ssh keys needs to go in /var/www/.ssh
+    
+To be graded, homework must be pushed to "solution" branch
