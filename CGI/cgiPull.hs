@@ -46,6 +46,7 @@ cgiMain = do
                 
                 
 getBranchName :: String -> Int -> String
+getBranchName [] _ = []
 getBranchName (x:xs) slashCount | x == '/' = if (slashCount == 2)
                                                 then xs
                                                 else getBranchName xs (slashCount + 1)
