@@ -26,6 +26,7 @@ cgiMain = do
                 then do
                     inputs <- getBody
                     user <- parseJSON $ B.pack inputs
+                    _ <- liftIO.begin.show $ user
                     _ <- liftIO.begin.show $ map email (map author (commits user))
                     let url = git_http_url (repository user)
                     let repoName = getRepoName (homepage (repository user)) 0
@@ -34,7 +35,7 @@ cgiMain = do
                     case eCode of
                         ExitSuccess -> output ""
                         _ -> do
-			    _ <- liftIO.begin.show $ stdOut
+                            _ <- liftIO.begin.show $ stdOut
                             _ <- liftIO.begin.show $ stdErr
 			    output ""
                     

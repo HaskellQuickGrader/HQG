@@ -20,11 +20,11 @@ data Commit = Commit {  id :: String,
                         added :: [String],
                         modified :: [String],
                         removed :: [String]
-                     } deriving GHC.Generics.Generic
+                     } deriving (GHC.Generics.Generic, Show)
              
 data Author = Author {  name :: String,
                         email :: String
-                     } deriving GHC.Generics.Generic
+                     } deriving (GHC.Generics.Generic, Show)
              
 data Repo = Repo {  name :: String,
                     url :: String,
@@ -33,7 +33,7 @@ data Repo = Repo {  name :: String,
                     git_http_url :: String,
                     git_ssh_url :: String,
                     visibility_level :: Int            
-                 } deriving GHC.Generics.Generic
+                 } deriving (GHC.Generics.Generic, Show)
         
 data User = User { object_kind :: String,
                     event_name :: String,
@@ -51,7 +51,7 @@ data User = User { object_kind :: String,
                     commits :: [Commit],
                     total_commits_count :: Int,
                     repository :: Repo
-                 } deriving GHC.Generics.Generic
+                 } deriving (GHC.Generics.Generic, Show)
 
 instance FromJSON Commit
 instance FromJSON Author          
