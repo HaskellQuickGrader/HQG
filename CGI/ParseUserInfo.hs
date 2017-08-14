@@ -38,7 +38,7 @@ data Repo = Repo {  name :: String,
 data Project = Project  {   name :: String,
                             description :: String,
                             web_url :: String,
-                            avatar_url :: String,
+                            -- avatar_url :: Object, -- Cannot parse this as it is always null
                             git_ssh_url :: String,
                             git_http_url :: String,
                             namespace :: String,

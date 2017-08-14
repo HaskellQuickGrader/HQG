@@ -20,7 +20,8 @@ cgiMain = do
                 then do
                     inputs <- getBody
                     user <- parseJSON $ B.pack inputs
-                    let branch = default_branch ((project user) :: Project)  
+                    let branchRef = ref user       -- used for getting branch name  
+                    let branch = getBranchName branchRef 0 
                     _ <- liftIO.begin.show $ "Pulling on branch name: "++branch
                     let url = git_http_url ((repository user) :: Repo)
                     let repoName = name ((project user) :: Project)
@@ -56,6 +57,13 @@ parseHwkNum [] = []
 parseHwkNum (x:xs) = if (x == '_')
                         then xs
                         else parseHwkNum xs
+                        
+getBranchName :: String -> Int -> String
+getBranchName [] _ = []
+getBranchName (x:xs) slashCount | x == '/' = if(slashCount == 1)
+                                                then xs
+                                                else getBranchName xs (slashCount + 1)
+                                | otherwise = getBranchName xs slashCount
                                
 
 main :: IO ()
