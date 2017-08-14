@@ -20,12 +20,12 @@ main = do
     args@(x:y:xs) <- getArgs
     _ <- begin.show $ " Homework number: "++x++", student's repo path: "++y 
     let ahgHwk = "AHG_Hwk"++x++".hs"
-    -- let ahgHwkExe = "./AHG_Hwk"++x   -- for Linux usage
-    let ahgHwkExe = "AHG_Hwk"++x++".exe" -- for Windows usage
+    let ahgHwkExe = "./AHG_Hwk"++x   -- for Linux usage
+    -- let ahgHwkExe = "AHG_Hwk"++x++".exe" -- for Windows usage
     --exists <- doesFileExist ahgHwkExe
     let reportFolder = "Hwk"++x  -- Report folder and student's solution file have same name
     currentDir <- getCurrentDirectory
-    let reportFolderPath = currentDir++"\\"++reportFolder
+    let reportFolderPath = currentDir++"/"++reportFolder
     clearFolder reportFolder reportFolderPath
     getStudentHwk y reportFolder
     makeAHG x ahgHwk
@@ -49,7 +49,7 @@ makeAHG hwkNum  ahgHwk = do
 runExe :: String -> String -> IO ()
 runExe ahgHwkExe repoDir = do 
                 currentDir <- getCurrentDirectory
-                (exitCode,stdOut,stdErr) <- readProcessWithExitCode (currentDir++"\\"++ahgHwkExe) [repoDir] ""
+                (exitCode,stdOut,stdErr) <- readProcessWithExitCode (currentDir++"/"++ahgHwkExe) [repoDir] ""
                 case exitCode of
                     ExitSuccess -> return ()
                     _ -> do
@@ -68,12 +68,12 @@ makeExe file = do
 getStudentHwk :: String -> String -> IO ()
 getStudentHwk repoFolder hwkName = do
     currentDir <- getCurrentDirectory
-    copyFile (repoFolder++"\\"++hwkName++".hs") $ currentDir++"\\"++hwkName++"\\"++hwkName++".hs"
+    copyFile (repoFolder++hwkName++".hs") $ currentDir++"/"++hwkName++"/"++hwkName++".hs"
     
 clearFolder :: String -> String -> IO ()
 clearFolder solutionName reportFolder = do
-    let reportPath = reportFolder++"\\GradeReport.txt"
-    let solutionPath = reportFolder++"\\"++solutionName++".hs"
+    let reportPath = reportFolder++"/GradeReport.txt"
+    let solutionPath = reportFolder++"/"++solutionName++".hs"
     _ <- begin.show $ "report Path: "++ reportPath
     _ <- begin.show $ "solution path: "++ solutionPath
     reportExists <- doesFileExist reportPath

@@ -1,7 +1,8 @@
---import Control.Monad
+-- import Control.Monad
 import Test.QuickCheck
 import System.Directory
 import System.Environment
+import TransferData
 
 import Hwk{{HwkNum}}.Hwk{{HwkNum}}Tests  --Hwk1.Hwk1Tests
 import GradeReport
@@ -16,6 +17,7 @@ import GradeReport
 
 makeGradeReport :: String -> IO ()
 makeGradeReport folder = do
+    _ <- begin.show $ "Making grade report"
     (grade, results) <- gradeHomework
     makeReport (show grade) results folder
     
@@ -45,7 +47,7 @@ runQuickCheck test@(points, prop) = do
         _ -> undefined
         
 moveReportToRepo :: String -> String -> IO ()
-moveReportToRepo repoDir currentDir = copyFile (currentDir++"\\GradeReport.txt") (repoDir++"\\GradeReport.txt")
+moveReportToRepo repoDir currentDir = copyFile (currentDir++"/GradeReport.txt") (repoDir++"/GradeReport.txt")
 
 moveSolutionFromRepo :: String -> String -> IO ()
 moveSolutionFromRepo solutionRepoPath solutionWorkingPath = copyFile solutionRepoPath solutionWorkingPath
@@ -54,7 +56,12 @@ main = do
     (x:xs) <- getArgs
     let reportFolder = "Hwk{{HwkNum}}"  -- Report folder and student's solution file have same name
     currentDir <- getCurrentDirectory
-    let reportFolderPath = currentDir++"\\"++reportFolder
-    moveSolutionFromRepo (x++"\\"++reportFolder++".hs") (reportFolderPath++"\\"++reportFolder++".hs")
+    _ <- begin.show $ "Current directory: "++currentDir
+    let reportFolderPath = currentDir++"/"++reportFolder
+    _ <- begin.show $ "Report Folder: "++reportFolderPath
+    moveSolutionFromRepo (x++reportFolder++".hs") (reportFolderPath++reportFolder++".hs")
+    _ <- begin.show $ "Solution moved from repo, making grade report"
     makeGradeReport reportFolder
+    _ <- begin.show $ "Grade report made, moving back to repo"
+    _ <- begin.show $ "Repo path?: "++x
     moveReportToRepo x reportFolderPath

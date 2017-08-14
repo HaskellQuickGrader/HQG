@@ -2,13 +2,15 @@ module GradeReport where
 
 import System.IO
 import Test.QuickCheck
+import TransferData
 
 import Data.Char(toUpper)
 
 
 makeReport :: String -> [Result] -> String -> IO ()
 makeReport grade results folder = do
-    reportHandle <- openFile (folder++"\\GradeReport.txt") WriteMode
+    _ <- begin.show $ folder
+    reportHandle <- openFile (folder++"/GradeReport.txt") WriteMode
     hPutStrLn reportHandle $ "Your total score is: "++grade++"."
     writeToReport results 0 reportHandle
     hClose reportHandle

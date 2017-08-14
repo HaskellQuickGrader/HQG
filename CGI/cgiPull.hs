@@ -46,7 +46,8 @@ cgiMain = do
 runAHGSetup :: String -> String -> CGI CGIResult
 runAHGSetup hwkNum repoFolder = do
     _ <- liftIO.begin.show $ "Running AHG Setup"
-    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/lib/cgi-bin/AHG/Hwk" ["./SetupAHG", hwkNum, repoFolder] ""
+    _ <- liftIO.begin.show $ "Repo folder: "++repoFolder
+    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/lib/cgi-bin/AHG/Hwk" ["./SetupAHG",hwkNum, repoFolder] ""
     case extCode of
        ExitSuccess -> do 
                    _ <- liftIO.begin.show $ "Finished grading homework"
