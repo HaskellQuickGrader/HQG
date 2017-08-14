@@ -30,18 +30,9 @@ cgiMain = do
                     let repoFolder = "/usr/lib/cgi-bin/Repos/Hwk_1"
                     if(branch == "solution")    -- only pull and grade on "solution" branch
                       then do 
-                            (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C",("/usr/lib/cgi-bin/Repos/"++repoName),"pull"] ""
+                            (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C",("/usr/lib/cgi-bin/Repos/"++repoName),"pull", "--all"] ""        -- Pull all branches
                             case eCode of
-                                ExitSuccess -> do
-                                                (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/lib/cgi-bin/AHG/Hwk" ["./SetupAHG", hwkNum, repoFolder] ""
-                                                case extCode of
-                                                    ExitSuccess -> do 
-                                                                    _ <- liftIO.begin.show $ "Finished grading homework"
-                                                                    output ""
-                                                    _ -> do
-                                                            _ <- liftIO.begin.show $ stdOut
-                                                            _ <- liftIO.begin.show $ stdErr
-                                                            output ""
+                                ExitSuccess -> switchBranch repoName hwkNum
                                 _ -> do
                                     _ <- liftIO.begin.show $ stdOut
                                     _ <- liftIO.begin.show $ stdErr
@@ -49,6 +40,32 @@ cgiMain = do
                       else output ""
             else do
                 _ <- liftIO.begin.show $ "You are not authenticated."
+                output ""
+                
+                
+runAHGSetup :: String -> String -> CGI CGIResult
+runAHGSetup hwkNum repoFolder = do
+    _ <- liftIO.begin.show $ "Running AHG Setup"
+    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/lib/cgi-bin/AHG/Hwk" ["./SetupAHG", hwkNum, repoFolder] ""
+    case extCode of
+       ExitSuccess -> do 
+                   _ <- liftIO.begin.show $ "Finished grading homework"
+                   output ""
+       _ -> do
+             _ <- liftIO.begin.show $ stndOut
+             _ <- liftIO.begin.show $ stndErr
+             output ""
+               
+-- Switch to "Solution" branch               
+switchBranch :: String -> String -> CGI CGIResult
+switchBranch repoName hwkNum = do
+        _ <- liftIO.begin.show $ "switching branch"
+        (exitCode,standardOut,standardErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C",("/usr/lib/cgi-bin/Repos/"++repoName),"checkout", "solution"] ""
+        case exitCode of
+          ExitSuccess -> runAHGSetup hwkNum $ "/usr/lib/cgi-bin/Repos/"++repoName
+          _ -> do
+                _ <- liftIO.begin.show $ standardOut
+                _ <- liftIO.begin.show $ standardErr
                 output ""
                 
                                    
