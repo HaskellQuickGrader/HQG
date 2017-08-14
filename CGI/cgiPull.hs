@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -fno-warn-tabs #-}
+{-# LANGUAGE DuplicateRecordFields#-}
 import Network.CGI 
 import System.Process
 import System.Exit
@@ -7,13 +8,6 @@ import TransferData
 import ParseUserInfo
 import qualified Data.ByteString.Lazy.Char8 as B
 
--- Hack to get repo name
-getRepoName :: String -> Int -> String
-getRepoName [] countSlash = []
-getRepoName (x:xs) countSlash | x == '/' = if(countSlash == 3)
-                                                then xs
-                                                else getRepoName xs (countSlash + 1)
-                              | otherwise = getRepoName xs countSlash
 
 cgiMain :: CGI CGIResult
 cgiMain = do
@@ -26,10 +20,10 @@ cgiMain = do
                 then do
                     inputs <- getBody
                     user <- parseJSON $ B.pack inputs
-                    let branch = getBranchName (ref user) 0
+                    let branch = default_branch ((project user) :: Project)  
                     _ <- liftIO.begin.show $ "Pulling on branch name: "++branch
-                    let url = git_http_url (repository user)
-                    let repoName = getRepoName (homepage (repository user)) 0
+                    let url = git_http_url ((repository user) :: Repo)
+                    let repoName = name ((project user) :: Project)
                     let hwkNum = parseHwkNum repoName
                     _ <- liftIO.begin.show $ "Homework number: "++hwkNum
                     let repoFolder = "/usr/lib/cgi-bin/Repos/Hwk_1"
@@ -56,20 +50,13 @@ cgiMain = do
                 _ <- liftIO.begin.show $ "You are not authenticated."
                 output ""
                 
-                
-getBranchName :: String -> Int -> String
-getBranchName [] _ = []
-getBranchName (x:xs) slashCount | x == '/' = if (slashCount == 1)
-                                                then xs
-                                                else getBranchName xs (slashCount + 1)
-                                | otherwise = getBranchName xs (slashCount)
-                                
+                                   
 parseHwkNum :: String -> String
 parseHwkNum [] = []
 parseHwkNum (x:xs) = if (x == '_')
                         then xs
                         else parseHwkNum xs
-                                
+                               
 
 main :: IO ()
 main = runCGI (handleErrors cgiMain)
