@@ -202,6 +202,7 @@ process or process-1.6.0.0
 aeson or aeson-1.2.0.0
 cgi or cgi-3001.3.0.2
 MissingH
+QuickCheck
 
 
 linux dependencies:

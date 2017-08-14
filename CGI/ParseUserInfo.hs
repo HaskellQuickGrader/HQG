@@ -34,6 +34,22 @@ data Repo = Repo {  name :: String,
                     git_ssh_url :: String,
                     visibility_level :: Int            
                  } deriving (GHC.Generics.Generic, Show)
+                 
+data Project = Project  {   name :: String,
+                            description :: String,
+                            web_url :: String,
+                            avatar_url :: String,
+                            git_ssh_url :: String,
+                            git_http_url :: String,
+                            namespace :: String,
+                            visibility_level :: Int,
+                            path_with_namespace :: String,
+                            default_branch :: String,
+                            homepage :: String,
+                            url :: String,
+                            ssh_url :: String,
+                            http_url :: String
+                        } deriving (GHC.Generics.Generic, Show)
         
 data User = User { object_kind :: String,
                     event_name :: String,
@@ -47,7 +63,7 @@ data User = User { object_kind :: String,
                     user_email :: String,
                     user_avatar :: String,
                     project_id :: Int,
-                    project :: Object,
+                    project :: Project,
                     commits :: [Commit],
                     total_commits_count :: Int,
                     repository :: Repo
@@ -56,6 +72,7 @@ data User = User { object_kind :: String,
 instance FromJSON Commit
 instance FromJSON Author          
 instance FromJSON Repo
+instance FromJSON Project
 instance FromJSON User
 
 

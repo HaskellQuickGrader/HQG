@@ -13,19 +13,6 @@ import GradeReport
 -- Make grade report and copy it back to student's report
 -- Delete student's solution and grade report in Hwk1 folder to ready it for next student
 
-clearFolder :: String -> String -> IO ()
-clearFolder solutionName reportFolder = do
-    let reportPath = reportFolder++"\\GradeReport.txt"
-    let solutionPath = reportFolder++"\\"++solutionName++".hs"
-    reportExists <- doesFileExist reportPath
-    solutionExists <- doesFileExist solutionPath
-    if(reportExists)
-     then removeFile $ reportFolder++"\\GradeReport.txt"
-     else return ()
-    if(solutionExists)
-     then removeFile solutionPath
-     else return ()
-
 
 makeGradeReport :: String -> IO ()
 makeGradeReport folder = do
@@ -68,7 +55,6 @@ main = do
     let reportFolder = "Hwk{{HwkNum}}"  -- Report folder and student's solution file have same name
     currentDir <- getCurrentDirectory
     let reportFolderPath = currentDir++"\\"++reportFolder
-    clearFolder reportFolder reportFolderPath
     moveSolutionFromRepo (x++"\\"++reportFolder++".hs") (reportFolderPath++"\\"++reportFolder++".hs")
     makeGradeReport reportFolder
     moveReportToRepo x reportFolderPath
