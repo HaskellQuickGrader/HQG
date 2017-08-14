@@ -58,4 +58,3 @@ main = do
     moveSolutionFromRepo (x++"\\"++reportFolder++".hs") (reportFolderPath++"\\"++reportFolder++".hs")
     makeGradeReport reportFolder
     moveReportToRepo x reportFolderPath
-    clearFolder reportFolder reportFolderPath

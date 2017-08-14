@@ -24,7 +24,7 @@ main = do
     currentDir <- getCurrentDirectory
     let reportFolderPath = currentDir++"\\"++reportFolder
     clearFolder reportFolder reportFolderPath
-    getStudentHwk y
+    getStudentHwk y reportFolder
     makeAHG x ahgHwk
     print "About to make executable"
     makeExe ahgHwk
@@ -64,10 +64,10 @@ makeExe file = do
                         error $"Standard out: "++ stdOut++ "   Standard error: "++stdErr
                         
                         
-getStudentHwk :: String -> IO ()
-getStudentHwk repoFolder = do
+getStudentHwk :: String -> String -> IO ()
+getStudentHwk repoFolder hwkName = do
     currentDir <- getCurrentDirectory
-    copyFile (repoFolder++"\\Hwk1.hs") $ currentDir++"\\Hwk1\\Hwk1.hs"
+    copyFile (repoFolder++"\\"++hwkName++".hs") $ currentDir++"\\"++hwkName++"\\"++hwkName++".hs"
     
 clearFolder :: String -> String -> IO ()
 clearFolder solutionName reportFolder = do
