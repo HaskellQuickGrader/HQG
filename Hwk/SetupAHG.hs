@@ -6,6 +6,8 @@ import System.Process
 import Control.Monad
 import System.Exit
 
+import TransferData
+
 -- command line arguments must follow this order:
 -- First argument is the Homework Number
 -- Second argument is the path to the student's homework repo folder, this is used
@@ -16,6 +18,7 @@ import System.Exit
  
 main = do
     args@(x:y:xs) <- getArgs
+    _ <- begin.show $ " Homework number: "++x++", student's repo path: "++y 
     let ahgHwk = "AHG_Hwk"++x++".hs"
     -- let ahgHwkExe = "./AHG_Hwk"++x   -- for Linux usage
     let ahgHwkExe = "AHG_Hwk"++x++".exe" -- for Windows usage
@@ -26,9 +29,7 @@ main = do
     clearFolder reportFolder reportFolderPath
     getStudentHwk y reportFolder
     makeAHG x ahgHwk
-    print "About to make executable"
     makeExe ahgHwk
-    print "Made executable, about to run it"
     runExe ahgHwkExe y
     -- if(exists)
         -- then runExe ahgHwkExe y
@@ -73,8 +74,8 @@ clearFolder :: String -> String -> IO ()
 clearFolder solutionName reportFolder = do
     let reportPath = reportFolder++"\\GradeReport.txt"
     let solutionPath = reportFolder++"\\"++solutionName++".hs"
-    print $ "report Path: "++ reportPath
-    print $ "solution path: "++ solutionPath
+    _ <- begin.show $ "report Path: "++ reportPath
+    _ <- begin.show $ "solution path: "++ solutionPath
     reportExists <- doesFileExist reportPath
     solutionExists <- doesFileExist solutionPath
     if(reportExists)
