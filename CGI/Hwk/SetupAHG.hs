@@ -19,20 +19,20 @@ import TransferData
  
 main = do
     args@(x:y:xs) <- getArgs
-    _ <- begin.show $ " Homework number: "++x++", student's repo path: "++y 
+    _ <- begin.show $ " Homework number: "++x++", student's repo path: "++y
+    listUser
     let ahgHwk = "AHG_Hwk"++x++".hs"
     let ahgHwkExe = "./AHG_Hwk"++x   -- for Linux usage
     -- let ahgHwkExe = "AHG_Hwk"++x++".exe" -- for Windows usage
     --exists <- doesFileExist ahgHwkExe
     let reportFolder = "Hwk"++x  -- Report folder and student's solution file have same name
-    -- _ <- setCurrentDirectory "/usr/lib/cgi-bin/AHG/Hwk/"
-    _ <- begin.show $ "Just set current directory"
-    -- dir <- getCurrentDirectory
-    --_ <- begin.show $ "Current Directory just set to : "++(show dir)
+    dir <- getCurrentDirectory
+    let currentDir = dir++"/Hwk"
+    -- _ <- begin.show $ "Current Directory just set to : "++(show dir)
     -- dir <- getCurrentDirectory
     -- let parentDir = show $ parent dir
     -- let currentDir = parentDir++"Hwk"
-    let currentDir = "/usr/lib/cgi-bin/AHG/Hwk"
+    --let currentDir = "/usr/lib/cgi-bin/AHG/Hwk"
     let reportFolderPath = currentDir++"/"++reportFolder
     clearFolder reportFolder reportFolderPath
     getStudentHwk y reportFolder currentDir
@@ -71,6 +71,17 @@ runExe ahgHwkExe repoDir currentDir = do
                            _ <- begin.show $ "Standard out: "++ (show stdOut)
                            _ <- begin. show $ "Standard error: "++(show stdErr)
 			   return ()
+
+listUser :: IO ()
+listUser = do
+	 (extCode,stdOut,stdErr) <- readProcessWithExitCode "whoami" [] ""
+	 case extCode of
+	   ExitSuccess -> do
+	   	       _ <- begin.show $ "Current user in SetupAHG: "++stdOut
+		       return ()
+	   _ -> do
+	     	_ <- begin.show $ "Standard Error in getting current user: "++stdErr
+		return ()
                     
 makeExe :: String -> String -> IO ()
 makeExe file currentDir = do
@@ -94,7 +105,7 @@ getStudentHwk repoFolder hwkName currentDir = do
     let copyFrom = repoFolder++hwkName++".hs"
     let copyTo = currentDir++"/"++hwkName++"/"++hwkName++".hs"
     _ <- begin.show $ "Copy from: "++copyFrom++", copy to: "++copyTo
-    copyFile (repoFolder++hwkName++".hs") $ currentDir++"/"++hwkName++"/"++hwkName++".hs"
+    copyFile copyFrom copyTo
     
 clearFolder :: String -> String -> IO ()
 clearFolder solutionName reportFolder = do

@@ -18,6 +18,7 @@ cgiMain = do
             Just h -> do
             if(h == "eNbbFFBqgBq5TSGdUtWr9gw4WXptmKbKQKp3P8bPAksYyKvx")
                 then do
+		    _ <- listUser
                     inputs <- getBody
                     user <- parseJSON $ B.pack inputs
                     let branchRef = ref user       -- used for getting branch name  
@@ -47,7 +48,7 @@ runAHGSetup :: String -> String -> CGI CGIResult
 runAHGSetup hwkNum repoFolder = do
     _ <- liftIO.begin.show $ "Running AHG Setup"
     _ <- liftIO.begin.show $ "Repo folder: "++repoFolder
-    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/lib/cgi-bin/AHG/Hwk/./SetupAHG" [hwkNum, repoFolder] ""
+    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/lib/cgi-bin/AHG/CGI/Hwk/./SetupAHG" [hwkNum, repoFolder] ""
     case extCode of
        ExitSuccess -> do 
                    _ <- liftIO.begin.show $ "Finished grading homework"
@@ -82,6 +83,17 @@ getBranchName (x:xs) slashCount | x == '/' = if(slashCount == 1)
                                                 then xs
                                                 else getBranchName xs (slashCount + 1)
                                 | otherwise = getBranchName xs slashCount
+
+listUser :: CGI CGIResult
+listUser = do
+	 (exitCode, stnOut, stdErr) <- liftIO $ readProcessWithExitCode "whoami" [] ""
+	 case exitCode of
+	   ExitSuccess -> do
+	   	       _ <- liftIO.begin.show $ "Current user: "++stnOut
+		       output ""
+	   _ -> do
+	     _ <- liftIO.begin.show $ "standard error: "++stdErr
+	     output ""
                                
 
 main :: IO ()

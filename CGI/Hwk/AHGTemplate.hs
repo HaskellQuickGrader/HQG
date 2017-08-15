@@ -54,8 +54,8 @@ moveSolutionFromRepo solutionRepoPath solutionWorkingPath = copyFile solutionRep
 main = do
     (x:xs) <- getArgs
     let reportFolder = "Hwk{{HwkNum}}"  -- Report folder and student's solution file have same name
-    --currentDir <- getCurrentDirectory
-    let currentDir = "/usr/lib/cgi-bin/AHG/Hwk/"
+    currentDir <- getCurrentDirectory
+    -- let currentDir = "/usr/lib/cgi-bin/AHG/Hwk/"
     _ <- begin.show $ "From AHG_Hwk1 - Current directory: "++currentDir
     let reportFolderPath = currentDir++"/"++reportFolder
     _ <- begin.show $ "Report Folder: "++reportFolderPath
