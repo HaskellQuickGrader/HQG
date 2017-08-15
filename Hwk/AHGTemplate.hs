@@ -1,4 +1,3 @@
--- import Control.Monad
 import Test.QuickCheck
 import System.Directory
 import System.Environment
@@ -55,8 +54,9 @@ moveSolutionFromRepo solutionRepoPath solutionWorkingPath = copyFile solutionRep
 main = do
     (x:xs) <- getArgs
     let reportFolder = "Hwk{{HwkNum}}"  -- Report folder and student's solution file have same name
-    currentDir <- getCurrentDirectory
-    _ <- begin.show $ "Current directory: "++currentDir
+    --currentDir <- getCurrentDirectory
+    let currentDir = "/usr/lib/cgi-bin/AHG/Hwk/"
+    _ <- begin.show $ "From AHG_Hwk1 - Current directory: "++currentDir
     let reportFolderPath = currentDir++"/"++reportFolder
     _ <- begin.show $ "Report Folder: "++reportFolderPath
     moveSolutionFromRepo (x++reportFolder++".hs") (reportFolderPath++reportFolder++".hs")

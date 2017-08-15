@@ -5,6 +5,7 @@ import System.Directory
 import System.Process
 import Control.Monad
 import System.Exit
+import Filesystem.Path
 
 import TransferData
 
@@ -24,50 +25,75 @@ main = do
     -- let ahgHwkExe = "AHG_Hwk"++x++".exe" -- for Windows usage
     --exists <- doesFileExist ahgHwkExe
     let reportFolder = "Hwk"++x  -- Report folder and student's solution file have same name
-    currentDir <- getCurrentDirectory
+    -- _ <- setCurrentDirectory "/usr/lib/cgi-bin/AHG/Hwk/"
+    _ <- begin.show $ "Just set current directory"
+    -- dir <- getCurrentDirectory
+    --_ <- begin.show $ "Current Directory just set to : "++(show dir)
+    -- dir <- getCurrentDirectory
+    -- let parentDir = show $ parent dir
+    -- let currentDir = parentDir++"Hwk"
+    let currentDir = "/usr/lib/cgi-bin/AHG/Hwk"
     let reportFolderPath = currentDir++"/"++reportFolder
     clearFolder reportFolder reportFolderPath
-    getStudentHwk y reportFolder
-    makeAHG x ahgHwk
-    makeExe ahgHwk
-    runExe ahgHwkExe y
+    getStudentHwk y reportFolder currentDir
+    makeAHG x ahgHwk currentDir
+    makeExe ahgHwk currentDir
+    runExe ahgHwkExe y currentDir
     -- if(exists)
         -- then runExe ahgHwkExe y
         -- else do
               
     
-makeAHG :: String -> String -> IO ()
-makeAHG hwkNum  ahgHwk = do
-    readHandle <- openFile "AHGTemplate.hs" ReadMode
-    writeHandle <- openFile ahgHwk WriteMode
+makeAHG :: String -> String -> String -> IO ()
+makeAHG hwkNum  ahgHwk currentDir = do
+    _ <- begin.show $ "starting to make AHG"
+    readHandle <- openFile (currentDir++"/AHGTemplate.hs") ReadMode
+    writeHandle <- openFile (currentDir++"/"++ahgHwk) WriteMode
     contents <- hGetContents readHandle
     let newLine = replace "{{HwkNum}}" hwkNum contents
     hPutStrLn writeHandle newLine
     hClose writeHandle
     hClose readHandle
+    _ <- begin.show $ "Finished making AHG"
+    return ()
 
-runExe :: String -> String -> IO ()
-runExe ahgHwkExe repoDir = do 
-                currentDir <- getCurrentDirectory
+runExe :: String -> String -> String -> IO ()
+runExe ahgHwkExe repoDir currentDir = do 
+                -- currentDir <- getCurrentDirectory
+		_ <- begin.show $ "running executable"
                 (exitCode,stdOut,stdErr) <- readProcessWithExitCode (currentDir++"/"++ahgHwkExe) [repoDir] ""
                 case exitCode of
-                    ExitSuccess -> return ()
+                    ExitSuccess -> do
+		    		   _ <- begin.show $ "Successfully ran executable"
+		    		   return ()
                     _ -> do
-                            print stdOut
-                            print stdErr
+		      	   _ <- begin.show $ "Unsuccessfully ran exectuable"
+                           _ <- begin.show $ "Standard out: "++ (show stdOut)
+                           _ <- begin. show $ "Standard error: "++(show stdErr)
+			   return ()
                     
-makeExe :: String -> IO ()
-makeExe file = do 
-                (exitCode,stdOut,stdErr) <- readProcessWithExitCode ("ghc") ["--make",file] ""
+makeExe :: String -> String -> IO ()
+makeExe file currentDir = do
+	        _ <- begin.show $ "making executable"
+		_ <- begin.show $ "File being made into executable: "++currentDir++"/"++file
+                (exitCode,stdOut,stdErr) <- readProcessWithExitCode ("ghc") ["--make",(currentDir++"/"++file)] ""
                 case exitCode of
-                    ExitSuccess -> return ()
+                    ExitSuccess -> do
+		    		   _ <- begin.show $ "Executable made successfully"
+				   return ()
                     _ -> do
+		        _ <- begin.show $ "Exectuable NOT made successfully"
                         error $"Standard out: "++ stdOut++ "   Standard error: "++stdErr
+		
                         
                         
-getStudentHwk :: String -> String -> IO ()
-getStudentHwk repoFolder hwkName = do
-    currentDir <- getCurrentDirectory
+getStudentHwk :: String -> String -> String -> IO ()
+getStudentHwk repoFolder hwkName currentDir = do
+    -- currentDir <- getCurrentDirectory
+    _ <- begin.show $ "getting student's homework"
+    let copyFrom = repoFolder++hwkName++".hs"
+    let copyTo = currentDir++"/"++hwkName++"/"++hwkName++".hs"
+    _ <- begin.show $ "Copy from: "++copyFrom++", copy to: "++copyTo
     copyFile (repoFolder++hwkName++".hs") $ currentDir++"/"++hwkName++"/"++hwkName++".hs"
     
 clearFolder :: String -> String -> IO ()
@@ -79,7 +105,7 @@ clearFolder solutionName reportFolder = do
     reportExists <- doesFileExist reportPath
     solutionExists <- doesFileExist solutionPath
     if(reportExists)
-     then removeFile $ reportFolder++"\\GradeReport.txt"
+     then removeFile $ reportFolder++"/GradeReport.txt"
      else return ()
     if(solutionExists)
      then removeFile solutionPath

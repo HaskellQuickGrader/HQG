@@ -47,7 +47,7 @@ runAHGSetup :: String -> String -> CGI CGIResult
 runAHGSetup hwkNum repoFolder = do
     _ <- liftIO.begin.show $ "Running AHG Setup"
     _ <- liftIO.begin.show $ "Repo folder: "++repoFolder
-    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/lib/cgi-bin/AHG/Hwk" ["./SetupAHG",hwkNum, repoFolder] ""
+    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/lib/cgi-bin/AHG/Hwk/./SetupAHG" [hwkNum, repoFolder] ""
     case extCode of
        ExitSuccess -> do 
                    _ <- liftIO.begin.show $ "Finished grading homework"
@@ -63,7 +63,7 @@ switchBranch repoName hwkNum = do
         _ <- liftIO.begin.show $ "switching branch"
         (exitCode,standardOut,standardErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C",("/usr/lib/cgi-bin/Repos/"++repoName),"checkout", "solution"] ""
         case exitCode of
-          ExitSuccess -> runAHGSetup hwkNum $ "/usr/lib/cgi-bin/Repos/"++repoName
+          ExitSuccess -> runAHGSetup hwkNum $ "/usr/lib/cgi-bin/Repos/"++repoName++"/"
           _ -> do
                 _ <- liftIO.begin.show $ standardOut
                 _ <- liftIO.begin.show $ standardErr
