@@ -3,8 +3,8 @@ import System.Directory
 import System.Environment
 import TransferData
 
-import Hwk1.Hwk1Tests  --Hwk1.Hwk1Tests
-import GradeReport
+import Hwk.Hwk1.Hwk1Tests  --Hwk1.Hwk1Tests
+import Hwk.GradeReport
 
 
 -- Overview of steps:
@@ -46,22 +46,32 @@ runQuickCheck test@(points, prop) = do
         _ -> undefined
         
 moveReportToRepo :: String -> String -> IO ()
-moveReportToRepo repoDir currentDir = copyFile (currentDir++"/GradeReport.txt") (repoDir++"/GradeReport.txt")
+moveReportToRepo repoDir currentDir = do
+		 	 _ <- begin.show $ "About to move grade report to repo."
+		 	 _ <- begin.show $ "Repo folder: "++repoDir
+			 _ <- begin.show $ "Current Dir: "++currentDir
+			 copyFile (currentDir++"/GradeReport.txt") (repoDir++"/GradeReport.txt")
+			 return ()
 
 moveSolutionFromRepo :: String -> String -> IO ()
-moveSolutionFromRepo solutionRepoPath solutionWorkingPath = copyFile solutionRepoPath solutionWorkingPath
+moveSolutionFromRepo solutionRepoPath solutionWorkingPath = do
+		         _ <- begin.show $ "About to move solution from repo."
+			 _ <- begin.show $ "Solution Repo Path: "++solutionRepoPath
+			 _ <- begin.show $ "Moving solution to path: "++solutionWorkingPath
+			 copyFile solutionRepoPath solutionWorkingPath
+			 return ()
         
 main = do
     (x:xs) <- getArgs
     let reportFolder = "Hwk1"  -- Report folder and student's solution file have same name
     currentDir <- getCurrentDirectory
-    -- let currentDir = "/usr/lib/cgi-bin/AHG/Hwk/"
     _ <- begin.show $ "From AHG_Hwk1 - Current directory: "++currentDir
-    let reportFolderPath = currentDir++"/"++reportFolder
+    _ <- begin.show $ "Repo Dir: "++x
+    let reportFolderPath = currentDir++"/Hwk/"++reportFolder
     _ <- begin.show $ "Report Folder: "++reportFolderPath
-    moveSolutionFromRepo (x++reportFolder++".hs") (reportFolderPath++reportFolder++".hs")
+    moveSolutionFromRepo (x++reportFolder++".hs") (reportFolderPath++"/"++reportFolder++".hs")
     _ <- begin.show $ "Solution moved from repo, making grade report"
-    makeGradeReport reportFolder
+    makeGradeReport $ reportFolderPath++"/"
     _ <- begin.show $ "Grade report made, moving back to repo"
     _ <- begin.show $ "Repo path?: "++x
     moveReportToRepo x reportFolderPath

@@ -61,6 +61,7 @@ runExe :: String -> String -> String -> IO ()
 runExe ahgHwkExe repoDir currentDir = do 
                 -- currentDir <- getCurrentDirectory
 		_ <- begin.show $ "running executable"
+		_ <- begin.show $ "Passing repo dir to AHGTemplate: "++repoDir
                 (exitCode,stdOut,stdErr) <- readProcessWithExitCode (currentDir++"/"++ahgHwkExe) [repoDir] ""
                 case exitCode of
                     ExitSuccess -> do
