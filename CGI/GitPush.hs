@@ -1,4 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-tabs #-}
+module GitPush where
+
 import Network.CGI 
 import System.Process
 import System.Exit

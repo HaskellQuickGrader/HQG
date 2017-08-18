@@ -6,6 +6,7 @@ import System.Exit
 import Control.Monad.Trans.Class
 import TransferData
 import ParseUserInfo
+import GitPush
 import qualified Data.ByteString.Lazy.Char8 as B
 
 
@@ -47,11 +48,14 @@ cgiMain = do
 runAHGSetup :: String -> String -> CGI CGIResult
 runAHGSetup hwkNum repoFolder = do
     _ <- liftIO.begin.show $ "Running AHG Setup"
-    _ <- liftIO.begin.show $ "Repo folder: "++repoFolder
+    _ <- liftIO.begin.show $ "Repo folder used for git add, commit, and push: "++repoFolder
     (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/lib/cgi-bin/AHG/CGI/Hwk/./SetupAHG" [hwkNum, repoFolder] ""
     case extCode of
        ExitSuccess -> do 
-                   _ <- liftIO.begin.show $ "Finished grading homework"
+                   _ <- liftIO.begin.show $ "Finished grading homework, pushing grade report to repo"
+                   _ <- liftIO.gitAddGradeReport $ repoFolder
+                   _ <- liftIO $ gitCommit  "Pushing grade report." repoFolder
+                   _ <- liftIO $ gitPushGradeReport "giturl--no used right now" repoFolder
                    output ""
        _ -> do
              _ <- liftIO.begin.show $ stndOut
