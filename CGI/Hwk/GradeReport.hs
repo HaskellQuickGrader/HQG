@@ -1,4 +1,4 @@
-module GradeReport where
+module Hwk.GradeReport where
 
 import System.IO
 import Test.QuickCheck
@@ -9,7 +9,7 @@ import Data.Char(toUpper)
 
 makeReport :: String -> [Result] -> String -> IO ()
 makeReport grade results folder = do
-    _ <- begin.show $ folder
+    _ <- begin.show $ "Path for grade report. / add to end: "++folder
     reportHandle <- openFile (folder++"/GradeReport.txt") WriteMode
     hPutStrLn reportHandle $ "Your total score is: "++grade++"."
     writeToReport results 0 reportHandle
