@@ -221,3 +221,6 @@ Include directions for setting up SSH, found here: https://docs.gitlab.com/ce/ss
     - ssh keys needs to go in /var/www/.ssh
     
 To be graded, homework must be pushed to "solution" branch
+
+
+Add QuickCheck to global: sudo cabal install QuickCheck --global
