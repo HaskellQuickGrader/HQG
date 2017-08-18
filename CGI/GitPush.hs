@@ -33,7 +33,7 @@ gitAddGradeReport repoFolder = do
                 
 gitPushGradeReport :: String -> String -> IO ()
 gitPushGradeReport gitUrl repoFolder = do
-        (exitCode,standardOut,standardErr) <- readProcessWithExitCode "/usr/bin/git" ["-C",repoFolder,"push"] ""
+        (exitCode,standardOut,standardErr) <- readProcessWithExitCode "/usr/bin/git" ["-C",repoFolder,"push", gitUrl] ""
         case exitCode of
           ExitSuccess -> do
                     _ <- begin.show $ "Pushing grade report to repo successful"
@@ -42,3 +42,15 @@ gitPushGradeReport gitUrl repoFolder = do
                 _ <- begin.show $ standardOut
                 _ <- begin.show $ standardErr
                 return ()
+                
+getGitUrlWithCreds :: String -> String -> String -> Int -> String
+getGitUrlWithCreds usrname pswd [] slashCount = []
+getGitUrlWithCreds usrname pswd gitUrl@(x:xs) slashCount | x == '/' = if(slashCount == 1)
+                                                                        then usrname++":"++pswd++"@"++xs
+                                                                        else x:getGitUrlWithCreds usrname pswd xs (slashCount + 1)
+                                                         | otherwise = x:getGitUrlWithCreds usrname pswd xs slashCount
+                                  
+
+
+
+ 

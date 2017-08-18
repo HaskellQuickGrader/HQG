@@ -34,7 +34,7 @@ cgiMain = do
                       then do 
                             (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C",("/usr/lib/cgi-bin/Repos/"++repoName),"pull", "--all"] ""        -- Pull all branches
                             case eCode of
-                                ExitSuccess -> switchBranch repoName hwkNum
+                                ExitSuccess -> switchBranch repoName hwkNum url
                                 _ -> do
                                     _ <- liftIO.begin.show $ stdOut
                                     _ <- liftIO.begin.show $ stdErr
@@ -45,8 +45,8 @@ cgiMain = do
                 output ""
                 
                 
-runAHGSetup :: String -> String -> CGI CGIResult
-runAHGSetup hwkNum repoFolder = do
+runAHGSetup :: String -> String -> String -> CGI CGIResult
+runAHGSetup url hwkNum repoFolder = do
     _ <- liftIO.begin.show $ "Running AHG Setup"
     _ <- liftIO.begin.show $ "Repo folder used for git add, commit, and push: "++repoFolder
     (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/lib/cgi-bin/AHG/CGI/Hwk/./SetupAHG" [hwkNum, repoFolder] ""
@@ -55,7 +55,9 @@ runAHGSetup hwkNum repoFolder = do
                    _ <- liftIO.begin.show $ "Finished grading homework, pushing grade report to repo"
                    _ <- liftIO.gitAddGradeReport $ repoFolder
                    _ <- liftIO $ gitCommit  "Pushing grade report." repoFolder
-                   _ <- liftIO $ gitPushGradeReport "giturl--no used right now" repoFolder
+                   let gitUrl = getGitUrlWithCreds "root" "password" url 0
+                   _ <- liftIO.begin.show $ "Git url for pushing repo: "++gitUrl
+                   _ <- liftIO $ gitPushGradeReport url repoFolder
                    output ""
        _ -> do
              _ <- liftIO.begin.show $ stndOut
@@ -63,12 +65,12 @@ runAHGSetup hwkNum repoFolder = do
              output ""
                
 -- Switch to "Solution" branch               
-switchBranch :: String -> String -> CGI CGIResult
-switchBranch repoName hwkNum = do
+switchBranch :: String -> String -> String -> CGI CGIResult
+switchBranch repoName hwkNum url = do
         _ <- liftIO.begin.show $ "switching branch"
         (exitCode,standardOut,standardErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C",("/usr/lib/cgi-bin/Repos/"++repoName),"checkout", "solution"] ""
         case exitCode of
-          ExitSuccess -> runAHGSetup hwkNum $ "/usr/lib/cgi-bin/Repos/"++repoName++"/"
+          ExitSuccess -> runAHGSetup url hwkNum $ "/usr/lib/cgi-bin/Repos/"++repoName++"/"
           _ -> do
                 _ <- liftIO.begin.show $ standardOut
                 _ <- liftIO.begin.show $ standardErr
