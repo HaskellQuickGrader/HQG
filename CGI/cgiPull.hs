@@ -36,13 +36,41 @@ cgiMain = do
                             case eCode of
                                 ExitSuccess -> switchBranch repoName hwkNum url
                                 _ -> do
-                                    _ <- liftIO.begin.show $ stdOut
-                                    _ <- liftIO.begin.show $ stdErr
+                                    _ <- liftIO.begin.show $ "Standard out: "++stdOut
+                                    _ <- liftIO.begin.show $ "Standard Error: "++stdErr
                                     output ""
                       else output ""
+                    _ <- setGitConfigUsername
+                    _ <- setGitConfigUserEmail
+                    output ""
             else do
                 _ <- liftIO.begin.show $ "You are not authenticated."
                 output ""
+                
+setGitConfigUsername :: CGI CGIResult
+setGitConfigUsername = do
+    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["config", "--global", "user.name", "michael"] ""
+    case extCode of
+       ExitSuccess -> do 
+                   _ <- liftIO.begin.show $ "git config email set successfully"
+                   output ""
+       _ -> do
+             _ <- liftIO.begin.show $ stndOut
+             _ <- liftIO.begin.show $ stndErr
+             output ""
+             
+setGitConfigUserEmail :: CGI CGIResult
+setGitConfigUserEmail = do
+    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["config", "--global", "user.email", "michael@gmail.com"] ""
+    case extCode of
+       ExitSuccess -> do 
+                   _ <- liftIO.begin.show $ "git config email set successfully"
+                   output ""
+       _ -> do
+             _ <- liftIO.begin.show $ stndOut
+             _ <- liftIO.begin.show $ stndErr
+             output ""
+     
                 
                 
 runAHGSetup :: String -> String -> String -> CGI CGIResult

@@ -2,7 +2,6 @@
 import Network.CGI 
 import System.Process
 import System.Exit
-import Control.Monad.Trans.Class
 import TransferData
 import ParseSystemEventInfo
 import qualified Data.ByteString.Lazy.Char8 as B
