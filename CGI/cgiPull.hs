@@ -19,7 +19,7 @@ cgiMain = do
             Just h -> do
             if(h == "eNbbFFBqgBq5TSGdUtWr9gw4WXptmKbKQKp3P8bPAksYyKvx")
                 then do
-		    _ <- listUser
+                    _ <- listUser
                     inputs <- getBody
                     user <- parseJSON $ B.pack inputs
                     let branchRef = ref user       -- used for getting branch name  
@@ -30,6 +30,8 @@ cgiMain = do
                     let hwkNum = parseHwkNum repoName
                     _ <- liftIO.begin.show $ "Homework number: "++hwkNum
                     let repoFolder = "/usr/lib/cgi-bin/Repos/Hwk_1"
+                    _ <- setGitConfigUsername
+                    _ <- setGitConfigUserEmail
                     if(branch == "solution")    -- only pull and grade on "solution" branch
                       then do 
                             (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C",("/usr/lib/cgi-bin/Repos/"++repoName),"pull", "--all"] ""        -- Pull all branches
@@ -40,8 +42,6 @@ cgiMain = do
                                     _ <- liftIO.begin.show $ "Standard Error: "++stdErr
                                     output ""
                       else output ""
-                    _ <- setGitConfigUsername
-                    _ <- setGitConfigUserEmail
                     output ""
             else do
                 _ <- liftIO.begin.show $ "You are not authenticated."
@@ -49,6 +49,7 @@ cgiMain = do
                 
 setGitConfigUsername :: CGI CGIResult
 setGitConfigUsername = do
+    _ <- liftIO.begin.show $ "setting git config user name"
     (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["config", "--global", "user.name", "michael"] ""
     case extCode of
        ExitSuccess -> do 
@@ -61,6 +62,7 @@ setGitConfigUsername = do
              
 setGitConfigUserEmail :: CGI CGIResult
 setGitConfigUserEmail = do
+    _ <- liftIO.begin.show $ "setting git config email"
     (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["config", "--global", "user.email", "michael@gmail.com"] ""
     case extCode of
        ExitSuccess -> do 
