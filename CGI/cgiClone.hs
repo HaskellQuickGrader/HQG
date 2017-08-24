@@ -35,7 +35,7 @@ cgiMain = do
                                     if(ge == "System Hook")
                                         then do 
                                             inputs <- getBody                                   -- Get body of reponse
-                                            systemEvent <- parseJSON $ B.pack inputs
+					    systemEvent <- parseJSON $ B.pack inputs
                                             let pathNameSpace = (path_with_namespace systemEvent)
                                             let eName = (event_name systemEvent)
                                             uri <- progURI
@@ -55,9 +55,7 @@ cgiMain = do
                                                             _ <- liftIO.begin.show $ stdErr
                                                             output ""
                                                 else
-                                                    do
-                                                    _ <- liftIO.begin.show $ "Event name not project_create"
-                                                    output ""
+                                                   output ""
                                             output ""
                                     else 
                                         output ""
