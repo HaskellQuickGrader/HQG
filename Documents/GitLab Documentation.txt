@@ -225,3 +225,5 @@ To be graded, homework must be pushed to "solution" branch
 
 
 Add QuickCheck to global: sudo cabal install QuickCheck --global
+
+Must push on master branch and then on solution, otherwise cgiPull doesn't work correctly

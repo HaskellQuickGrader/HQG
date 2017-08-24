@@ -11,7 +11,7 @@ append (x:xs) l2 = xs
 -- Q2: Define the all function which returns true when applied to a
 -- list of all true, otherwise returns false.
 all :: [Bool] -> Bool
-all p =  True
+all m =  True
 
 -- Q3: Define the foldr function.
 foldr :: (a -> b -> b) -> b -> [a] -> b
