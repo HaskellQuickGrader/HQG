@@ -22,6 +22,7 @@ cgiMain = do
                     _ <- listUser
                     inputs <- getBody
                     user <- parseJSON $ B.pack inputs
+                    setHomePath
                     let branchRef = ref user       -- used for getting branch name  
                     let branch = getBranchName branchRef 0 
                     _ <- liftIO.begin.show $ "Pulling on branch name: "++branch
@@ -47,6 +48,19 @@ cgiMain = do
                 _ <- liftIO.begin.show $ "You are not authenticated."
                 output ""
                 
+setHomePath :: CGI CGIResult
+setHomePath = do
+    _ <- liftIO.begin.show $ "setting home path"
+    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "export" ["HOME=", "/var/www"] ""
+    case extCode of
+       ExitSuccess -> do 
+                   _ <- liftIO.begin.show $ "Home path set successfully"
+                   output ""
+       _ -> do
+             _ <- liftIO.begin.show $ stndOut
+             _ <- liftIO.begin.show $ stndErr
+             output ""            
+            
 setGitConfigUsername :: CGI CGIResult
 setGitConfigUsername = do
     _ <- liftIO.begin.show $ "setting git config user name"
