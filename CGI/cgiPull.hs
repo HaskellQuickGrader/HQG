@@ -51,14 +51,14 @@ cgiMain = do
 setHomePath :: CGI CGIResult
 setHomePath = do
     _ <- liftIO.begin.show $ "setting home path"
-    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "export" ["HOME=", "/var/www"] ""
+    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "export" ["HOME","+", "/var/www"] ""
     case extCode of
        ExitSuccess -> do 
                    _ <- liftIO.begin.show $ "Home path set successfully"
                    output ""
        _ -> do
-             _ <- liftIO.begin.show $ stndOut
-             _ <- liftIO.begin.show $ stndErr
+             _ <- liftIO.begin.show $ "Standard out:"++stndOut
+             _ <- liftIO.begin.show $ "Standard error:"++stndErr
              output ""            
             
 setGitConfigUsername :: CGI CGIResult
