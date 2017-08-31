@@ -30,8 +30,8 @@ cgiMain = do
                     let hwkNum = parseHwkNum repoName
                     _ <- liftIO.begin.show $ "Homework number: "++hwkNum
                     let repoFolder = "/usr/lib/cgi-bin/Repos/Hwk_1"
-                    _ <- setGitConfigUsername
-                    _ <- setGitConfigUserEmail
+                    -- _ <- setGitConfigUsername
+                    -- _ <- setGitConfigUserEmail
                     if(branch == "solution")    -- only pull and grade on "solution" branch
                       then do 
                             (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C",("/usr/lib/cgi-bin/Repos/"++repoName),"pull", "--all"] ""        -- Pull all branches
