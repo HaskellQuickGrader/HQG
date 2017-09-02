@@ -24,8 +24,9 @@ cgiMain = do
                     user <- parseJSON $ B.pack inputs
                     setHomePath
                     --echoHome
-                    setGitConfigUsername
-                    setGitConfigUserEmail
+                    -- setGitConfigUsername
+                    -- setGitConfigUserEmail
+                    setGitConfigs
                     let branchRef = ref user       -- used for getting branch name  
                     let branch = getBranchName branchRef 0 
                     _ <- liftIO.begin.show $ "Pulling on branch name: "++branch
@@ -50,6 +51,19 @@ cgiMain = do
             else do
                 _ <- liftIO.begin.show $ "You are not authenticated."
                 output ""
+                
+setGitConfigs :: CGI CGIResult
+setGitConfigs = do
+    _ <- liftIO.begin.show $ "Calling bash script"
+    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/bin/bash" ["setGitConfig.sh"] ""
+    case extCode of
+       ExitSuccess -> do 
+                   _ <- liftIO.begin.show $ "Bash script finished"
+                   output ""
+       _ -> do
+             _ <- liftIO.begin.show $ "Standard out:"++stndOut
+             _ <- liftIO.begin.show $ "Standard error:"++stndErr
+             output ""  
                 
 echoHome :: CGI CGIResult
 echoHome = do
