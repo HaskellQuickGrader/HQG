@@ -23,7 +23,7 @@ cgiMain = do
                     inputs <- getBody
                     user <- parseJSON $ B.pack inputs
                     setHomePath
-                    echoHome
+                    --echoHome
                     setGitConfigUsername
                     setGitConfigUserEmail
                     let branchRef = ref user       -- used for getting branch name  
@@ -54,7 +54,7 @@ cgiMain = do
 echoHome :: CGI CGIResult
 echoHome = do
     _ <- liftIO.begin.show $ "echo home path"
-    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/bin/bash" ["-c","echo","$HOME"] ""
+    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/bin/bash" ["-c","\"echo $HOME\""] ""
     case extCode of
        ExitSuccess -> do 
                    _ <- liftIO.begin.show $ stndOut
@@ -67,7 +67,7 @@ echoHome = do
 setHomePath :: CGI CGIResult
 setHomePath = do
     _ <- liftIO.begin.show $ "setting home path"
-    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/bin/bash" ["-c","export","HOME=","/var/www"] ""
+    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/bin/bash" ["-c","export","HOME=/var/www\""] ""
     case extCode of
        ExitSuccess -> do 
                    _ <- liftIO.begin.show $ "Home path set successfully"
@@ -80,7 +80,7 @@ setHomePath = do
 setGitConfigUsername :: CGI CGIResult
 setGitConfigUsername = do
     _ <- liftIO.begin.show $ "setting git config user name"
-    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["config", "--global", "user.name", "michael"] ""
+    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "export HOME=/var/www;/usr/bin/git" ["config", "--global", "user.name", "michael"] ""
     case extCode of
        ExitSuccess -> do 
                    _ <- liftIO.begin.show $ "git config email set successfully"
@@ -93,7 +93,7 @@ setGitConfigUsername = do
 setGitConfigUserEmail :: CGI CGIResult
 setGitConfigUserEmail = do
     _ <- liftIO.begin.show $ "setting git config email"
-    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["config", "--global", "user.email", "michael@gmail.com"] ""
+    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "export HOME=/var/www;/usr/bin/git" ["config", "--global", "user.email", "michael@gmail.com"] ""
     case extCode of
        ExitSuccess -> do 
                    _ <- liftIO.begin.show $ "git config email set successfully"
