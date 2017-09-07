@@ -22,10 +22,6 @@ cgiMain = do
                     _ <- listUser
                     inputs <- getBody
                     user <- parseJSON $ B.pack inputs
-                    setHomePath
-                    --echoHome
-                    -- setGitConfigUsername
-                    -- setGitConfigUserEmail
                     setGitConfigs
                     let branchRef = ref user       -- used for getting branch name  
                     let branch = getBranchName branchRef 0 
@@ -55,7 +51,7 @@ cgiMain = do
 setGitConfigs :: CGI CGIResult
 setGitConfigs = do
     _ <- liftIO.begin.show $ "Calling bash script"
-    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/bin/bash" ["setGitConfig.sh"] ""
+    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "./setGitConfig.sh" [] ""
     case extCode of
        ExitSuccess -> do 
                    _ <- liftIO.begin.show $ "Bash script finished"
