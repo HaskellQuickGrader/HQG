@@ -6,17 +6,17 @@ import System.Process
 import System.Exit
 import TransferData
 
-runGitPush :: String -> Strin -> IO ()
+runGitPush :: String -> String -> IO ()
 runGitPush gitUrl repoFolder = do   
     (exitCode,standardOut,standardErr) <- readProcessWithExitCode "./PushToRepo.sh" [gitUrl] ""
-        case exitCode of
-          ExitSuccess -> do
-                    _ <- begin.show $ "Pushing grade report successful"
-                    return ()
-          _ -> do
-                _ <- begin.show $ standardOut
-                _ <- begin.show $ standardErr
+    case exitCode of
+      ExitSuccess -> do
+                _ <- begin.show $ "Pushing grade report successful"
                 return ()
+      _ -> do
+            _ <- begin.show $ standardOut
+            _ <- begin.show $ standardErr
+            return ()
  
                 
 getGitUrlWithCreds :: String -> String -> String -> Int -> String
