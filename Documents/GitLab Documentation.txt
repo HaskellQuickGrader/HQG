@@ -227,3 +227,12 @@ To be graded, homework must be pushed to "solution" branch
 Add QuickCheck to global: sudo cabal install QuickCheck --global
 
 Must push on master branch and then on solution, otherwise cgiPull doesn't work correctly
+
+Set www-data as login-able:
+sudo usermod -U www-data
+sudo uermod -p password www-data
+sudo usermod -s /bin/bash www-data
+
+Disable SSH root login,www-data
+
+Change /var/www owner to www-data:www-data, then run git config commands to set username and email
