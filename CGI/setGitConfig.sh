@@ -1,6 +1,7 @@
 #!/bin/bash
 
 echo "Setting git global config username and email" >> output.txt
+export HOME=/var/www
 echo $HOME >> output.txt
 git config --global user.name "michael"
 git config --global user.email "michael@gmail.com"
