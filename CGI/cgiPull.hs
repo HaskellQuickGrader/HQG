@@ -58,7 +58,7 @@ runAHGSetup :: String -> String -> String -> CGI CGIResult
 runAHGSetup url hwkNum repoFolder = do
     _ <- liftIO.begin.show $ "Running AHG Setup"
     _ <- liftIO.begin.show $ "Repo folder used for git add, commit, and push: "++repoFolder
-    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/lib/cgi-bin/AHG/CGI/Hwk/./SetupAHG" [hwkNum, repoFolder] ""
+    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/lib/cgi-bin/AHG/GradeHomework/./SetupAHG" [hwkNum, repoFolder] ""
     case extCode of
        ExitSuccess -> do 
                    _ <- liftIO.begin.show $ "Finished grading homework, pushing grade report to repo"
