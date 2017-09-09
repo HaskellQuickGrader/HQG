@@ -1,8 +1,8 @@
-module GradeReport where
+module GradeHomework.GradeReport where
 
 import System.IO
 import Test.QuickCheck
-import TransferData
+import GradeHomework.TransferData
 
 import Data.Char(toUpper)
 
