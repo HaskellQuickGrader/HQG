@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -fno-warn-tabs #-}
+
 import System.IO
 import Data.List.Utils
 import System.Environment
@@ -5,9 +7,9 @@ import System.Directory
 import System.Process
 import Control.Monad
 import System.Exit
-import Filesystem.Path
 
-import GradeHomework.TransferData
+
+import TransferData
 
 -- command line arguments must follow this order:
 -- First argument is the Homework Number
@@ -26,13 +28,7 @@ main = do
     -- let ahgHwkExe = "AHG_Hwk"++x++".exe" -- for Windows usage
     --exists <- doesFileExist ahgHwkExe
     let reportFolder = "Hwk"++x  -- Report folder and student's solution file have same name
-    dir <- getCurrentDirectory
-    let currentDir = dir++"/Hwk"
-    -- _ <- begin.show $ "Current Directory just set to : "++(show dir)
-    -- dir <- getCurrentDirectory
-    -- let parentDir = show $ parent dir
-    -- let currentDir = parentDir++"Hwk"
-    --let currentDir = "/usr/lib/cgi-bin/AHG/Hwk"
+    let currentDir = "/usr/lib/cgi-bin/AHG/GradeHomework"
     let reportFolderPath = currentDir++"/"++reportFolder
     clearFolder reportFolder reportFolderPath
     getStudentHwk y reportFolder currentDir
