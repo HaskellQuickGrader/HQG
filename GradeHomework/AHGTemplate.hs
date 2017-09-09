@@ -5,7 +5,7 @@ import System.Directory
 import System.Environment
 import TransferData
 
-import Hwk{{HwkNum}}.Hwk{{HwkNum}}Tests     -- 1.Hwk1Tests
+import GradeHomework.Hwk{{HwkNum}}.Hwk{{HwkNum}}Tests     -- 1.Hwk1Tests
 import GradeReport
 
 
