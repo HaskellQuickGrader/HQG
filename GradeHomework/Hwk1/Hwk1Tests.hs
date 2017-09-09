@@ -1,12 +1,12 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 {- Homework 1 Tests -}
-module Hwk1.Hwk1Tests (tests, Test) where
+module GradeHomework.Hwk1.Hwk1Tests (tests, Test) where
 
 import Test.QuickCheck
 
 import Prelude hiding (all, foldr)
-import Hwk1.Hwk1
+import GradeHomework.Hwk1.Hwk1
 
 -- Type of tests: Double is the point value, and Property is the actual
 -- test case.
