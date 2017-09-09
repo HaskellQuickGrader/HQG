@@ -2,7 +2,7 @@ module GradeReport where
 
 import System.IO
 import Test.QuickCheck
-import GradeHomework.GHwkTransferData
+import GHwkTransferData
 
 import Data.Char(toUpper)
 
