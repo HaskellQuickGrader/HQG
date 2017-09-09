@@ -1,4 +1,4 @@
-module GradeHomework.TransferData where
+module TransferData where
 
 import System.IO
 

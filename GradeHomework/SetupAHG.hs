@@ -9,7 +9,7 @@ import Control.Monad
 import System.Exit
 
 
-import GradeHomework.TransferData
+import GradeHomework.GHwkTransferData
 
 -- command line arguments must follow this order:
 -- First argument is the Homework Number
