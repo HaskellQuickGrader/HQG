@@ -27,13 +27,14 @@ main = do
     let ahgHwkExe = "./AHG_Hwk"++x   -- for Linux usage
     -- let ahgHwkExe = "AHG_Hwk"++x++".exe" -- for Windows usage
     --exists <- doesFileExist ahgHwkExe
-    let reportFolder = "Hwk"++x  -- Report folder and student's solution file have same name
+    currentDir <- getCurrentDirectory
+    let homeworkName = "Hwk"++x
+    let reportFolder = "/Hwk/"++homeworkName  -- Report folder and student's solution file have same name
 --     let currentDir = "/usr/lib/cgi-bin/AHG/GradeHomework"
-    dir <- getCurrentDirectory
-    let currentDir = dir++"/GradingModules"
+    _ <- begin.show $ "Current directory in SetupAHG.hs "++ currentDir
     let reportFolderPath = currentDir++"/"++reportFolder
-    clearFolder reportFolder reportFolderPath
-    getStudentHwk y reportFolder currentDir
+    clearFolder homeworkName reportFolderPath
+    getStudentHwk y homeworkName reportFolderPath
     makeAHG x ahgHwk currentDir
     makeExe ahgHwk currentDir
     runExe ahgHwkExe y currentDir
@@ -98,11 +99,10 @@ makeExe file currentDir = do
                         
                         
 getStudentHwk :: String -> String -> String -> IO ()
-getStudentHwk repoFolder hwkName currentDir = do
-    -- currentDir <- getCurrentDirectory
+getStudentHwk repoFolder hwkName reportPath = do
     _ <- begin.show $ "getting student's homework"
     let copyFrom = repoFolder++hwkName++".hs"
-    let copyTo = currentDir++"/"++hwkName++"/"++hwkName++".hs"
+    let copyTo = reportPath++"/"++hwkName++".hs"
     _ <- begin.show $ "Copy from: "++copyFrom++", copy to: "++copyTo
     copyFile copyFrom copyTo
     
