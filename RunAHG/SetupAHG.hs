@@ -9,7 +9,7 @@ import Control.Monad
 import System.Exit
 
 
-import GradeHomework.GHwkTransferData
+import CGI_Modules.TransferData
 
 -- command line arguments must follow this order:
 -- First argument is the Homework Number
@@ -28,7 +28,9 @@ main = do
     -- let ahgHwkExe = "AHG_Hwk"++x++".exe" -- for Windows usage
     --exists <- doesFileExist ahgHwkExe
     let reportFolder = "Hwk"++x  -- Report folder and student's solution file have same name
-    let currentDir = "/usr/lib/cgi-bin/AHG/GradeHomework"
+--     let currentDir = "/usr/lib/cgi-bin/AHG/GradeHomework"
+    dir <- getCurrentDirectory
+    let currentDir = dir++"/GradingModules"
     let reportFolderPath = currentDir++"/"++reportFolder
     clearFolder reportFolder reportFolderPath
     getStudentHwk y reportFolder currentDir

@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric, DuplicateRecordFields, OverloadedLabels #-}
 
-module ParseSystemEventInfo (SystemEvent(..), parseJSON)where
+module CGI_Modules.ParseSystemEventInfo (SystemEvent(..), parseJSON)where
     
 
 import GHC.Generics

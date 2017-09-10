@@ -3,10 +3,10 @@
 import Test.QuickCheck
 import System.Directory
 import System.Environment
-import TransferData
+import CGI_Modules.TransferData
 
-import GradeHomework.Hwk{{HwkNum}}.Hwk{{HwkNum}}Tests     -- 1.Hwk1Tests
-import GradeReport
+import GradingModules.Hwk{{HwkNum}}.Hwk{{HwkNum}}Tests  -- 1.Hwk1Tests
+import GradingModules.GradeReport
 
 
 -- Overview of steps:

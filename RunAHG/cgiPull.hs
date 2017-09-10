@@ -4,9 +4,9 @@ import Network.CGI
 import System.Process
 import System.Exit
 import Control.Monad.Trans.Class
-import TransferData
-import ParseUserInfo
-import GitPush
+import CGI_Modules.TransferData
+import CGI_Modules.ParseUserInfo
+import CGI_Modules.GitPush
 import qualified Data.ByteString.Lazy.Char8 as B
 
 
@@ -43,7 +43,7 @@ cgiMain = do
 setGitConfigs :: CGI CGIResult
 setGitConfigs = do
     _ <- liftIO.begin.show $ "Calling bash script"
-    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "./GitStudentRepo.sh" [] ""
+    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "CGI_Modules/./GitStudentRepo.sh" [] ""
     case extCode of
        ExitSuccess -> do 
                    _ <- liftIO.begin.show $ "Bash script finished"
@@ -58,7 +58,7 @@ runAHGSetup :: String -> String -> String -> CGI CGIResult
 runAHGSetup url hwkNum repoFolder = do
     _ <- liftIO.begin.show $ "Running AHG Setup"
     _ <- liftIO.begin.show $ "Repo folder used for git add, commit, and push: "++repoFolder
-    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/lib/cgi-bin/AHG/GradeHomework/./SetupAHG" [hwkNum, repoFolder] ""
+    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/lib/cgi-bin/AHG/RunAHG/./SetupAHG" [hwkNum, repoFolder] ""
     case extCode of
        ExitSuccess -> do 
                    _ <- liftIO.begin.show $ "Finished grading homework, pushing grade report to repo"

@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveGeneric, DuplicateRecordFields #-}
-module Commit where
+module CGI_Modules.Commit where
 
 import GHC.Generics    
 import Data.Aeson

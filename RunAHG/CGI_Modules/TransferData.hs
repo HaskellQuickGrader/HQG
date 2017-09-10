@@ -1,4 +1,4 @@
-module TransferData where
+module CGI_Modules.TransferData where
 
 import System.IO
 

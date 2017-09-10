@@ -2,8 +2,8 @@
 import Network.CGI 
 import System.Process
 import System.Exit
-import TransferData
-import ParseSystemEventInfo
+import CGI_Modules.TransferData
+import CGI_Modules.ParseSystemEventInfo
 import qualified Data.ByteString.Lazy.Char8 as B
 
 

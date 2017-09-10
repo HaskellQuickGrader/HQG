@@ -1,4 +1,4 @@
-module GradeHomework.Hwk1.Hwk1 where
+module GradingModules.Hwk1.Hwk1 where
 
 import Prelude hiding ((++), all, foldr)    
     
