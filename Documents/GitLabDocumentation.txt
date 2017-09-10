@@ -1,0 +1,238 @@
+INSTALLING GITLAB OMNIBUS
+1. Go to https://about.gitlab.com/downloads
+2. Pick version to download, the currect version in use if Ubuntu 16.04
+3. Copy and paste commands if they are different than below:
+	a. install and configure dependencies: sudo apt-get install curl openssh-server ca-certificates postfix
+	b. Add GitLab package server and install it: curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | sudo bash
+           sudo apt-get install gitlab-ce
+	c. Configure and start GitLab: sudo gitlab-ctl reconfigure
+4. Find your server's IP address by typing command: ifconfig
+5. Put it's IP address in your browser and set up a password, the username is "root" initially but can be changed under settings
+
+*******************************************************************************************************
+*******************************************************************************************************
+
+CONFIGUREING APACHE2 TO HOST OTHER WEBPAGES
+
+NB. Make sure the Omnibus Gitlab installation is complete before moving to these steps.
+   
+Overview: We will install Apache2, edit the gitlab.rb configuration file so that gitlab doesn't use the
+embedded Nginx web server and instead uses Apache.   
+1. Install Apache2 server: sudo apt-get update && sudo apt-get upgrade
+			   sudo apt-get install apache2
+2. Configure gitlab to use Apache2 instead of Nginx.
+	a. Open up gitlab configuration, use command: nano /etc/gitlab/gitlab.rb
+    b-1. Find "external_url", after it place your IP address as a URL with single quotes around it 
+	b-2. Add the following lines: 
+                    nginx['enable'] = false
+				    web_server['external_users'] = ['www-data']
+				    gitlab_rails['trusted_proxies'] = [ 'put your IP address here between the single-quotes']
+				    gitlab_workhorse['listen_network'] = "tcp"
+				    gitlab_workhorse['listen_addr'] = "127.0.0.1:8181"
+	c. For the changes to take effect run  the command: sudo gitlab-ctl reconfigure
+	d. Go download the correct apache2 configuration for gitlab found here: https://gitlab.com/gitlab-org/gitlab-recipes/tree/master/web-server/apache
+	e. Make sure you download the omnibus version, place this file in cd /etc/apache2/sites-available
+    h. DO NOT DO --> Comment out "ServerName" using "#" without the quotation marks.  This is usually the first line 
+	   in the <VirtualHost> block
+	i. Delete FQDN add replace it with your IP address, the line should read something like this: ProxyPassReverse http://your-IP-address-here
+	j. At the end of the file you'll see a paths with "YOUR_SERVER_FQDN" in them.  Replace "YOUR_SERVER_FQDN" with Gitlab for
+	   each of those lines.  One is for the ErrorLog and the other three are CustomLogs. You don't 
+	   currently have those paths so let's go create them in the next step
+	k. You will also want to save you changes and go create the folder to collect the error logs.
+	   Save the config file and follow the commands below to make the needed folders.
+	   Use these commands: cd /var/log
+			       mkdir httpd
+			       cd httpd
+			       mkdir logs
+    l. Navigate back to /etc/apache2/sites-available
+	l. Enable the gitlab config file you've made: sudo a2ensite gitlab-omnibus-apache24.conf
+	f. We need to enable several dependencies for apache. Run the following commands.
+		i. sudo a2enmod rewrite
+		ii. sudo a2enmod proxy
+		iii. sudo a2enmod proxy_http
+		iv. sudo service apache2 restart
+	f. Currently apache has a default configuration for port 80, so we need to disable that conf file.
+	   It's usually called 000-default.conf and we disable it using the command: 
+    f. Run: sudo service apache2 reload
+    f. Navigate to: cd /etc/apache2/mods-enabled
+    f. Run command: sudo a2enmod cgi.load (may end up enableing cgid.load instead )
+    f. Run: sudo service apache2 restart
+	g. OLD --> Open up the new gitlab configuration file, mine is called (gitlab-omnibus-apache24.conf): nano gitlab-omnibus-apache24.conf
+	
+	m. Configure the port you want to use . Use the command: nano /etc/apache2/ports.conf
+    n. You will see the on line 5 - "Listen 80". You want to add a line below that with the port you want to 
+	   use. So it will look something like this:
+		Listen 80
+		Listen 8282 
+	   In this above example I added "Listen 8282". You would replace "8282" with the port number
+	   you want to use.
+	o. Restart Apache to implement the changes you made, use the command: sudo service apache2 restart
+
+- At this point your gitlab website should be up and running.  Test this be putting you IP address in
+  your web browser.
+
+
+
+
+*******************************************************************************************************
+*******************************************************************************************************
+
+CONFIGURING APACHE2 TO RUN CGI PROCESSES
+
+1. Create the "cgi-bin" directory:
+	a. Navigate to /usr/lib: cd /usr/lib
+	b. if you already have the folder /cgi-bin then you are done if not create it: mkdir cgi-bin
+2. Go into the folder you just created: cd cgi-bin
+3. Place your haskell cgi file into here
+4. Make the haskell file executable: ghc -- make your-file-name
+	-you should now see several other files there ending in .hi, .hs, .o and one without a file extension
+5. Navigate: cd /etc/apache2/sites-available
+6. Create a new configuration file to run your cgi scripts, its best to copy the default file (000-default.conf)
+   and rename it to whatever you want, here I named it test.conf: cp 000-default.conf test.conf
+7. Open it to edit it: nano test.conf
+8. Make the following changes:
+	a. On line 9, put your IP address after "ServerName". After the change mine reads: ServerName 192.168.43.133
+	b. After line 12 that reads "DocumentRoot" add the following code:
+		ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
+
+		<Directory "/usr/lib/cgi-bin">
+			Options +ExecCGI
+			AddHandler cgi-script .cgi .hs
+			Options FollowSymLinks
+			Require all granted
+		</Directory>
+	c. The last change is to add the port number, which you get to pick.  Add it to the first line of the file
+	   inside the Virtual Host tag: <VirtualHost *:8282>
+		- In this example 8282 is the port, change 8282 to whatever port you want
+        
+   - TODO: Add a2ensite command
+   - TODO: Add sudo service apache2 reload
+   - TODO: Add note about adding the port number to the script URL: http://ipAddress:port/cgi-bin/cgiProcessName
+
+
+
+
+*******************************************************************************************************
+*******************************************************************************************************
+NB: Don't use NGINX, it is too difficult to configure multiple websites being hosted on the same server.  Use Apache, see instructions above.
+
+CONFIGURING NGINX TO HOST OTHER WEBPAGES
+
+NB. Much of this was taken from 
+NB. It makes you life easier to become the admin so:
+	a. type: sudo su
+	b. type in admin password
+	c. this allows access to certain files later
+1. Create a custom config file for serving your other web content: 
+	a. Navigate to folder: cd /var/opt/gitlab/nginx/conf
+	b. create new file: touch custom-http.conf
+	c. edit new file: nano custom-http.conf
+	d. we will edit this file
+2. Add newly created custom-http.conf to nginx.conf
+	a. Navigate to folder: cd /etc/gitlab
+	b. edit file: nano gitlab.rb
+	C. Add this line after "external_url": nginx['custom_nginx_config'] = "include /var/opt/gitlab/nginx/conf/custom-http.conf;"
+3. Tell gitlab to reevaluate config file: gitlab-ctl reconfigure
+4. Create homepage root to hold content for your new webpage:
+	a. Navigate to appropriate folder: cd /var/www
+	b. make new folder to house all content for webpage: mkdir homepage
+	c. go into folder: cd homepage
+	d. make folder to house specifics of website: mkdir testing
+	e. go into folder: cd testing
+	f. make and edit a new file: 
+		i. make file: touch index.html
+		ii. edit file, and place any needed html in file: nano index.html
+		iii. control + "O" and enter to save, and control + "X" to exit
+5. Edit custom-http.conf
+	a. nano /var/opt/gitlab/nginx/conf/custom-http.conf
+	b. put this code in your file:
+		server {
+		        listen *:80;
+        		server_name 127.0.0.1;
+        		root /var/www/homepage;
+
+		        location / {
+                		try_files $uri $uri/index.html $uri.html;
+        		}
+
+			location /testing {
+				try_files $uri $uri/index.html $uri.html;
+			}
+		}
+	c. hit control + "O", then enter to save
+	d. press control + "X" to exit nano
+	e. the location will mirror the url, for example typing your server's ip address as the url will
+		display the index.html file in /var/www/homepage but if you type in the server's ip address and /testing
+		as the url, the browser will display the index.html file located /var/www/homepage/testing. In this way you
+		can create and house your content in an organized way
+5. restart nginx: gitlab-ctl restart nginx
+
+
+*******************************************************************************************************
+*******************************************************************************************************
+
+NB. Most likely not going to use this method
+
+CREATING CUSTOM HOOKS:
+1.Pick a project that needs a custom git hook.
+2.On the GitLab server, navigate to the project's repository directory. For an installation from source the path is usually /home/git/repositories/<group>/<project>.git. 
+  For Omnibus installs the path is usually /var/opt/gitlab/git-data/repositories/<group>/<project>.git.
+3.Create a new directory in this location called custom_hooks.
+4.Inside the new custom_hooks directory, create a file with a name matching the hook type. For a pre-receive hook the file name should be pre-receive with no extension.
+	-use "touch <filename>"
+5.Make the hook file executable and make sure it's owned by git.
+	-use "chmod +x <filename>"
+6.Write the code to make the git hook function as expected. Hooks can be in any language. Ensure the 'shebang' at the top properly reflects the language type. 
+  For example, if the script is in Ruby the shebang will be #!/usr/bin/env ruby.
+
+********************************************************************************************************
+********************************************************************************************************
+You must be using the Haskell Platform 8.0 or higher as it supports the DuplicateRecordFields extension
+- As of 6/3/2017 if you download the default Haskell Platform version for Ubuntu it is the Haskell 7.*.  
+    Download and install the generic linux version instead.
+    - Use sudo wget https://haskell.org/platform/download/8.0.2/haskell-platform-8.0.2-unknown-posix--full-x86_64.tar.gz
+    for the current version as of 7/12/2017
+    - If using a system with position independent executables by default (like Ubuntu 16.10 and above), edit the GHC file at
+      usr/local/haskell/ghc-____/lib/ghc-____/settings
+      and change the "compiler supports -no-pie" flag from "NO" to "YES"
+      
+
+Haskell Dependencies:
+process or process-1.6.0.0
+aeson or aeson-1.2.0.0
+cgi or cgi-3001.3.0.2
+MissingH
+QuickCheck
+system-filepath
+
+
+linux dependencies:
+gcc
+libgmp-dev
+git
+
+NB. If using an VM, make sure you have at least 2 GB of memory available
+
+Make a note about adding the port to hook URL in gitlab webpage
+
+Make note about setting www-data as the user
+
+Include directions for setting up SSH, found here: https://docs.gitlab.com/ce/ssh/README.html
+    - ssh -T git@example.com, replace "example.com" with IP address, should see welcome message
+    - ssh keys needs to go in /var/www/.ssh
+    
+To be graded, homework must be pushed to "solution" branch
+
+
+Add QuickCheck to global: sudo cabal install QuickCheck --global
+
+Must push on master branch and then on solution, otherwise cgiPull doesn't work correctly
+
+Set www-data as login-able:
+sudo usermod -U www-data
+sudo uermod -p password www-data
+sudo usermod -s /bin/bash www-data
+
+Disable SSH root login,www-data
+
+Change /var/www owner to www-data:www-data, then run git config commands to set username and email
