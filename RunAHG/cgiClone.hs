@@ -2,6 +2,7 @@
 import Network.CGI 
 import System.Process
 import System.Exit
+import System.Directory
 import CGI_Modules.TransferData
 import CGI_Modules.ParseSystemEventInfo
 import qualified Data.ByteString.Lazy.Char8 as B
@@ -40,6 +41,7 @@ cgiMain = do
                                             let className = (owner_name systemEvent)
                                             let repoFolderBase = "/usr/lib/cgi-bin/Repos"
                                             let repoFolder = repoFolderBase++className
+                                            _ <- liftIO $ checkClassDirectory repoFolder
                                             let eName = (event_name systemEvent)
                                             uri <- progURI
                                             let domain = composeCloneURL (show uri) 0 0
@@ -66,6 +68,13 @@ cgiMain = do
             else do
                 _ <- liftIO.begin.show $ "You are not authenticated."
                 output ""
+                
+checkClassDirectory :: String -> IO ()
+checkClassDirectory classDir = do
+    doesExists <- doesDirectoryExist classDir
+    if(doesExists == False)
+        then createDirectory classDir
+        else return ()
 
                 
 main :: IO ()
