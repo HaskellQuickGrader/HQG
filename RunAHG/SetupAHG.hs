@@ -50,7 +50,7 @@ setupWorkingDir studentName currentDir hwkFolder = do
     let workingDir = currentDir++"/"++studentName++"/"
     let hwkTemplateFolder = currentDir++"/"++"Homeworks/"++hwkFolder++"/"
     doesExist <- doesDirectoryExist workingDir  -- Should be false
-    if(doesExist == True)
+    if(doesExist == False)
         then do
             (exitCode,stdOut,stdErr) <- readProcessWithExitCode "cp" ["-R", hwkTemplateFolder, workingDir] ""
             case exitCode of
