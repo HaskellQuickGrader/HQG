@@ -30,10 +30,10 @@ main = do
     let homeworkName = "Hwk"++hwkNum
     let fullRepoPath = repoPath++"/"++"Hwk_"++hwkNum
     let reportFolder = "/Hwk/"++homeworkName
+    currentDir <- getCurrentDirectory
     let reportFolderPath = currentDir++"/"++reportFolder
     let workingDir = currentDir++"/"++studentName++"/"++homeworkName++"/"
     
-    currentDir <- getCurrentDirectory
     setupWorkingDir studentName currentDir homeworkName
     
     getStudentHwk fullRepoPath homeworkName reportFolderPath
@@ -53,13 +53,12 @@ setupWorkingDir studentName currentDir hwkFolder = do
     if(doesExist == False)
         then do
             (exitCode,stdOut,stdErr) <- readProcessWithExitCode "cp" [hwkTemplateFolder, workingDir] ""
-                case exitCode of
-                    ExitSuccess -> do
-		    		   _ <- begin.show $ "Successfully created working directory"
-                    _ -> do
-                            _ <- begin.show $ "Unsuccessfully created working directory"
-                            _ <- begin.show $ "Standard out: "++ (show stdOut)
-                            _ <- begin.show $ "Standard error: "++(show stdErr)
+            case exitCode of
+                ExitSuccess -> begin.show $ "Successfully created working directory"
+                _ -> do
+                        begin.show $ "Unsuccessfully created working directory"
+                        begin.show $ "Standard out: "++ (show stdOut)
+                        begin.show $ "Standard error: "++(show stdErr)
         else begin.show $ "Working directory already exists"
         
 makeAHG :: String -> String -> String -> IO ()
