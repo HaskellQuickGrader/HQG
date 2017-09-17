@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -fno-warn-tabs #-}
-{-# LANGUAGE DuplicateRecordFields#-}
-import Network.CGI 
+{-# LANGUAGE DuplicateRecordFields #-}
+import Network.CGI
+import qualified Network.CGI.Protocol as NCP
 import System.Process
 import System.Exit
 import Control.Monad.Trans.Class
@@ -19,31 +20,55 @@ cgiMain = do
             Just h -> do
             if(h == "eNbbFFBqgBq5TSGdUtWr9gw4WXptmKbKQKp3P8bPAksYyKvx")
                 then do
+                    -- Get info from git push
                     _ <- listUser
                     inputs <- getBody
                     user <- parseJSON $ B.pack inputs
-                    setGitConfigs
-                    let branchRef = ref user       -- used for getting branch name  
+                    
+                    -- The branch name that was just pushed is not expressly given
+                    -- instead we have to parse it out from "ref"
+                    let branchRef = ref user         
                     let branch = getBranchName branchRef 0 
                     _ <- liftIO.begin.show $ "Pulling on branch name: "++branch
                     let url = git_http_url ((repository user) :: Repo)
-                    let repoName = name ((project user) :: Project)
-                    let hwkNum = parseHwkNum repoName
+                                        
+                    -- Repo folder structure:
+                    -- Repos/<ClassName>/<StudentName>/Hwk_<Number>/Hwk<Number>.hs
+                    -- Compose Repo path
+                    let studentName = name ((project user) :: Project)
+                    let className = namespace ((project user) :: Project)
+                    let repoBase = "/usr/lib/cgi-bin/Repos/"
+                    let classRepo = repoBase++className++"/"
+                    let studentRepo = classRepo++studentRepo++"/"
+                    
+                    -- Homework number is not simply parsed from data received when 
+                    -- student pushes, instead commit message must only contain homework number
+                    let hwkNum = show $ getHwkNumber $ commits user
                     _ <- liftIO.begin.show $ "Homework number: "++hwkNum
-                    let repoFolder = "/usr/lib/cgi-bin/Repos/Hwk_1"
-                    if(branch == "solution")    -- only pull and grade on "solution" branch
+                    _ <- liftIO.begin.show $ "Student's repo path: "++studentRepo
+                    
+                    if(branch == "solution" && hwkNum /= "-1")    -- only pull and grade on "solution" branch
                       then do 
-                            runAHGSetup url hwkNum $ "/usr/lib/cgi-bin/Repos/"++repoName++"/"
+                            -- Pull student's solution and put it in their repo
+                            gitStudentRepo studentRepo hwkNum
+                            runAHGSetup url hwkNum studentRepo
                       else output ""
                     output ""
             else do
                 _ <- liftIO.begin.show $ "You are not authenticated."
                 output ""
                 
-setGitConfigs :: CGI CGIResult
-setGitConfigs = do
+getHwkNumber :: [Commit] -> Int
+getHwkNumber [] = (-1)    -- indicates there was no homework number as a commit
+getHwkNumber (c:cts) = case NCP.maybeRead (message c) :: Maybe Int of
+                Just num -> num
+                Nothing -> getHwkNumber cts
+                
+                
+gitStudentRepo :: String -> String -> CGI CGIResult
+gitStudentRepo repoPath hwkNum = do
     _ <- liftIO.begin.show $ "Calling bash script"
-    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "CGI_Modules/./GitStudentRepo.sh" [] ""
+    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "CGI_Modules/./GitStudentRepo.sh" [repoPath, hwkNum] ""
     case extCode of
        ExitSuccess -> do 
                    _ <- liftIO.begin.show $ "Bash script finished"
