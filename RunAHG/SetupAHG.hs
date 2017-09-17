@@ -25,12 +25,9 @@ main = do
     listUser
     let ahgHwk = "AHG_Hwk"++x++".hs"
     let ahgHwkExe = "./AHG_Hwk"++x   -- for Linux usage
-    -- let ahgHwkExe = "AHG_Hwk"++x++".exe" -- for Windows usage
-    --exists <- doesFileExist ahgHwkExe
     currentDir <- getCurrentDirectory
     let homeworkName = "Hwk"++x
     let reportFolder = "/Hwk/"++homeworkName  -- Report folder and student's solution file have same name
---     let currentDir = "/usr/lib/cgi-bin/AHG/GradeHomework"
     _ <- begin.show $ "Current directory in SetupAHG.hs "++ currentDir
     let reportFolderPath = currentDir++"/"++reportFolder
     clearFolder homeworkName reportFolderPath

@@ -37,11 +37,11 @@ cgiMain = do
                                             inputs <- getBody                                   -- Get body of reponse
 					    systemEvent <- parseJSON $ B.pack inputs
                                             let pathNameSpace = (path_with_namespace systemEvent)
-                                            -- Make sure class folder in Repos directory exists
+
+					    -- Make sure class folder in Repos directory exists
                                             let className = (owner_name systemEvent)
-                                            let repoFolderBase = "/usr/lib/cgi-bin/Repos"
+                                            let repoFolderBase = "/usr/lib/cgi-bin/Repos/"
                                             let repoFolder = repoFolderBase++className
-                                            _ <- liftIO $ checkClassDirectory repoFolder
                                             let eName = (event_name systemEvent)
                                             uri <- progURI
                                             let domain = composeCloneURL (show uri) 0 0
@@ -51,6 +51,7 @@ cgiMain = do
                                                 then do
                                                     _ <- liftIO.begin.show $ inputs
                                                     _ <- liftIO.begin.show $ "clone command: "++cloneCmd
+						    _ <- liftIO $ checkClassDirectory repoFolder
                                                     (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C",repoFolder,"clone", cloneURL] ""        -- Clone newly created repo
                                                     case eCode of
                                                         ExitSuccess -> do
@@ -71,8 +72,8 @@ cgiMain = do
                 
 checkClassDirectory :: String -> IO ()
 checkClassDirectory classDir = do
-    doesExists <- doesDirectoryExist classDir
-    if(doesExists == False)
+    doesExist <- doesDirectoryExist classDir
+    if(doesExist == False)
         then createDirectory classDir
         else return ()
 
