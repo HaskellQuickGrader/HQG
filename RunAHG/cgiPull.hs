@@ -39,7 +39,7 @@ cgiMain = do
                     let className = namespace ((project user) :: Project)
                     let repoBase = "/usr/lib/cgi-bin/Repos/"
                     let classRepo = repoBase++className++"/"
-                    let studentRepo = classRepo++studentRepo++"/"
+                    let studentRepo = classRepo++studentName++"/"
                     
                     -- Homework number is not simply parsed from data received when 
                     -- student pushes, instead commit message must only contain homework number
