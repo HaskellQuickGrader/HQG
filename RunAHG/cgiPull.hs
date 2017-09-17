@@ -52,7 +52,7 @@ cgiMain = do
                             -- Pull student's solution and put it in their repo
 			    _ <- liftIO.begin.show $ hwkNum
                             gitStudentRepo studentRepo (show hwkNum) classRepo
-                            runAHGSetup url (show hwkNum) studentRepo
+                            runAHGSetup url (show hwkNum) studentRepo studentName
                       else output ""
                     output ""
             else do
@@ -80,11 +80,11 @@ gitStudentRepo repoPath hwkNum classRepo = do
              output ""  
                  
                 
-runAHGSetup :: String -> String -> String -> CGI CGIResult
-runAHGSetup url hwkNum repoFolder = do
+runAHGSetup :: String -> String -> String -> String -> CGI CGIResult
+runAHGSetup url hwkNum repoFolder studentName = do
     _ <- liftIO.begin.show $ "Running AHG Setup"
     _ <- liftIO.begin.show $ "Repo folder used for git add, commit, and push: "++repoFolder
-    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/lib/cgi-bin/AHG/RunAHG/./SetupAHG" [hwkNum, repoFolder] ""
+    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/lib/cgi-bin/AHG/RunAHG/./SetupAHG" [hwkNum, repoFolder, studentName] ""
     case extCode of
        ExitSuccess -> do 
                    _ <- liftIO.begin.show $ "Finished grading homework, pushing grade report to repo"
