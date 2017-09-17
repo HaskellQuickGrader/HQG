@@ -31,12 +31,12 @@ main = do
     let fullRepoPath = repoPath++"/"++"Hwk_"++hwkNum
     let reportFolder = "/Hwk/"++homeworkName
     currentDir <- getCurrentDirectory
-    let reportFolderPath = currentDir++"/"++reportFolder
     let workingDir = currentDir++"/"++studentName++"/"++homeworkName++"/"
+    -- let reportFolderPath = workingDir++"Homeworks/"
     
     setupWorkingDir studentName currentDir homeworkName
     
-    getStudentHwk fullRepoPath homeworkName reportFolderPath
+    getStudentHwk fullRepoPath homeworkName workingDir
     makeAHG hwkNum ahgHwk currentDir
     makeExe ahgHwk currentDir
     runExe ahgHwkExe fullRepoPath currentDir
@@ -119,7 +119,7 @@ makeExe file currentDir = do
 getStudentHwk :: String -> String -> String -> IO ()
 getStudentHwk repoFolder hwkName reportPath = do
     _ <- begin.show $ "getting student's homework"
-    let copyFrom = repoFolder++hwkName++".hs"
+    let copyFrom = repoFolder++"/"++hwkName++".hs"
     let copyTo = reportPath++"/"++hwkName++".hs"
     _ <- begin.show $ "Copy from: "++copyFrom++", copy to: "++copyTo
     copyFile copyFrom copyTo
