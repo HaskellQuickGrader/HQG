@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 {- Homework 1 Tests -}
-module Hwk.Hwk1.Hwk1Tests (tests, Test) where
+module Homeworks.Hwk1.Hwk1Tests (tests, Test) where
 
 import Test.QuickCheck
 

@@ -5,7 +5,7 @@ import System.Directory
 import System.Environment
 import CGI_Modules.TransferData
 
-import Hwk.Hwk{{HwkNum}}.Hwk{{HwkNum}}Tests  -- 1.Hwk1Tests
+import Homeworks.Hwk{{HwkNum}}.Hwk{{HwkNum}}Tests  -- 1.Hwk1Tests
 import GradingModules.GradeReport
 
 
