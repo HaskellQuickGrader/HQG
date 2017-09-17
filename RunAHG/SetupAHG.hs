@@ -47,12 +47,12 @@ main = do
 
 setupWorkingDir :: String -> String -> String -> IO ()
 setupWorkingDir studentName currentDir hwkFolder = do
-    let workingDir = currentDir++"/"++studentName
-    let hwkTemplateFolder = currentDir++"/"++"Homeworks/"++hwkFolder
+    let workingDir = currentDir++"/"++studentName++"/"
+    let hwkTemplateFolder = currentDir++"/"++"Homeworks/"++hwkFolder++"/"
     doesExist <- doesDirectoryExist workingDir  -- Should be false
-    if(doesExist == False)
+    if(doesExist == True)
         then do
-            (exitCode,stdOut,stdErr) <- readProcessWithExitCode ("cp "++hwkTemplateFolder++" "++workingDir) [] ""
+            (exitCode,stdOut,stdErr) <- readProcessWithExitCode "cp" ["-R", hwkTemplateFolder, workingDir] ""
             case exitCode of
                 ExitSuccess -> begin.show $ "Successfully created working directory"
                 _ -> do
