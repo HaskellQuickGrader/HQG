@@ -43,15 +43,16 @@ cgiMain = do
                     
                     -- Homework number is not simply parsed from data received when 
                     -- student pushes, instead commit message must only contain homework number
-                    let hwkNum = show $ getHwkNumber $ commits user
-                    _ <- liftIO.begin.show $ "Homework number: "++hwkNum
+                    let hwkNum = getHwkNumber $ commits user
+                    _ <- liftIO.begin.show $ "Homework number: "++ show hwkNum
                     _ <- liftIO.begin.show $ "Student's repo path: "++studentRepo
                     
-                    if(branch == "solution" && hwkNum /= "-1")    -- only pull and grade on "solution" branch
+                    if(branch == "solution" && hwkNum /= (-1))    -- only pull and grade on "solution" branch
                       then do 
                             -- Pull student's solution and put it in their repo
-                            gitStudentRepo studentRepo hwkNum
-                            runAHGSetup url hwkNum studentRepo
+			    _ <- liftIO.begin.show $ hwkNum
+                            gitStudentRepo studentRepo $ show hwkNum
+                            runAHGSetup url (show hwkNum) studentRepo
                       else output ""
                     output ""
             else do
