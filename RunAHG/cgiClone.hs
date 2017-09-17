@@ -43,6 +43,7 @@ cgiMain = do
                                             let cloneCmd = "clone "++cloneURL
                                             if (eName == "project_create")                      -- verify this is a project creation
                                                 then do
+                                                    _ <- liftIO.begin.show $ inputs
                                                     _ <- liftIO.begin.show $ "clone command: "++cloneCmd
                                                     (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C","/usr/lib/cgi-bin/Repos","clone", cloneURL] ""        -- Clone newly created repo
                                                     case eCode of
