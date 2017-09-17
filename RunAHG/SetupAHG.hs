@@ -52,7 +52,7 @@ setupWorkingDir studentName currentDir hwkFolder = do
     doesExist <- doesDirectoryExist workingDir  -- Should be false
     if(doesExist == False)
         then do
-            (exitCode,stdOut,stdErr) <- readProcessWithExitCode "cp" [hwkTemplateFolder, workingDir] ""
+            (exitCode,stdOut,stdErr) <- readProcessWithExitCode ("cp "++hwkTemplateFolder++" "++workingDir) [] ""
             case exitCode of
                 ExitSuccess -> begin.show $ "Successfully created working directory"
                 _ -> do
