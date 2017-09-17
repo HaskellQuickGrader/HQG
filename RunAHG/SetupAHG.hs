@@ -31,7 +31,7 @@ main = do
     let fullRepoPath = repoPath++"Hwk_"++hwkNum++"/"
     let reportFolder = "/Hwk/"++homeworkName
     currentDir <- getCurrentDirectory
-    let workingDir = currentDir++"/"++studentName++"/"++homeworkName++"/"
+    let workingDir = currentDir++"/"++studentName++"/"
     -- let reportFolderPath = workingDir++"Homeworks/"
     
     setupWorkingDir studentName currentDir homeworkName
