@@ -36,6 +36,10 @@ cgiMain = do
                                             inputs <- getBody                                   -- Get body of reponse
 					    systemEvent <- parseJSON $ B.pack inputs
                                             let pathNameSpace = (path_with_namespace systemEvent)
+                                            -- Make sure class folder in Repos directory exists
+                                            let className = (owner_name systemEvent)
+                                            let repoFolderBase = "/usr/lib/cgi-bin/Repos"
+                                            let repoFolder = repoFolderBase++className
                                             let eName = (event_name systemEvent)
                                             uri <- progURI
                                             let domain = composeCloneURL (show uri) 0 0
@@ -45,7 +49,7 @@ cgiMain = do
                                                 then do
                                                     _ <- liftIO.begin.show $ inputs
                                                     _ <- liftIO.begin.show $ "clone command: "++cloneCmd
-                                                    (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C","/usr/lib/cgi-bin/Repos","clone", cloneURL] ""        -- Clone newly created repo
+                                                    (eCode,stdOut,stdErr) <- liftIO $ readProcessWithExitCode "/usr/bin/git" ["-C",repoFolder,"clone", cloneURL] ""        -- Clone newly created repo
                                                     case eCode of
                                                         ExitSuccess -> do
                                                                     _ <- liftIO.begin.show $ "Repo cloned successfully"
