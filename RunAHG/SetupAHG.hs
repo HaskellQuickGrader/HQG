@@ -33,8 +33,8 @@ main = do
     let workingDir = currentDir++"/"++studentName++"/"
     
     -- Customize Homework files
-    let hwkPath = workingDir++"/"++homeworkName++".hs"
-    let hwkTestsPath = workingDir++"/"++homeworkName++"Tests.hs"
+    let hwkPath = workingDir++homeworkName++".hs"
+    let hwkTestsPath = workingDir++homeworkName++"Tests.hs"
     customizeFile studentName "{{Name}}" hwkPath
     customizeFile studentName "{{Name}}" hwkTestsPath
     
