@@ -33,16 +33,17 @@ main = do
     let workingDir = currentDir++"/"++studentName++"/"
            
     setupWorkingDir studentName currentDir homeworkName
+    getStudentHwk fullRepoPath homeworkName workingDir
     
-    -- Customize Homework files
+    -- Customize working directory files
     let hwkPath = workingDir++homeworkName++".hs"
     let hwkTestsPath = workingDir++homeworkName++"Tests.hs"
     customizeFile studentName "{{Name}}" hwkPath
     customizeFile studentName "{{Name}}" hwkTestsPath
-    
-    getStudentHwk fullRepoPath homeworkName workingDir
     customAHG <- makeAHG hwkNum ahgHwk currentDir workingDir
     customizeFile studentName "{{Name}}" customAHG
+    
+    -- Make and run executable
     makeExe ahgHwk currentDir
     runExe ahgHwkExe fullRepoPath workingDir
 
