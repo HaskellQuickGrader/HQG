@@ -31,6 +31,8 @@ main = do
     let fullRepoPath = repoPath++"Hwk_"++hwkNum++"/"
     currentDir <- getCurrentDirectory
     let workingDir = currentDir++"/"++studentName++"/"
+           
+    setupWorkingDir studentName currentDir homeworkName
     
     -- Customize Homework files
     let hwkPath = workingDir++homeworkName++".hs"
@@ -38,7 +40,6 @@ main = do
     customizeFile studentName "{{Name}}" hwkPath
     customizeFile studentName "{{Name}}" hwkTestsPath
     
-    setupWorkingDir studentName currentDir homeworkName
     getStudentHwk fullRepoPath homeworkName workingDir
     customAHG <- makeAHG hwkNum ahgHwk currentDir workingDir
     customizeFile studentName "{{Name}}" customAHG
