@@ -29,20 +29,21 @@ main = do
     let ahgHwkExe = "./AHG_Hwk"++hwkNum
     let homeworkName = "Hwk"++hwkNum
     let fullRepoPath = repoPath++"Hwk_"++hwkNum++"/"
-    let reportFolder = "/Hwk/"++homeworkName
     currentDir <- getCurrentDirectory
     let workingDir = currentDir++"/"++studentName++"/"
-    -- let reportFolderPath = workingDir++"Homeworks/"
+    
+    -- Customize Homework files
+    let hwkPath = workingDir++"/"++homeworkName++".hs"
+    let hwkTestsPath = workingDir++"/"++homeworkName++"Tests.hs"
+    customizeFile studentName "{{Name}}" hwkPath
+    customizeFile studentName "{{Name}}" hwkTestsPath
     
     setupWorkingDir studentName currentDir homeworkName
-    
     getStudentHwk fullRepoPath homeworkName workingDir
-    makeAHG hwkNum ahgHwk currentDir
+    customAHG <- makeAHG hwkNum ahgHwk currentDir workingDir
+    customizeFile studentName "{{Name}}" customAHG
     makeExe ahgHwk currentDir
-    runExe ahgHwkExe fullRepoPath currentDir
-    -- if(exists)
-        -- then runExe ahgHwkExe y
-        -- else do
+    runExe ahgHwkExe fullRepoPath workingDir
 
 
 setupWorkingDir :: String -> String -> String -> IO ()
@@ -61,25 +62,47 @@ setupWorkingDir studentName currentDir hwkFolder = do
                         begin.show $ "Standard error: "++(show stdErr)
         else begin.show $ "Working directory already exists"
         
-makeAHG :: String -> String -> String -> IO ()
-makeAHG hwkNum  ahgHwk currentDir = do
-    _ <- begin.show $ "starting to make AHG"
-    readHandle <- openFile (currentDir++"/AHGTemplate.hs") ReadMode
-    writeHandle <- openFile (currentDir++"/"++ahgHwk) WriteMode
-    contents <- hGetContents readHandle
-    let newLine = replace "{{HwkNum}}" hwkNum contents
-    hPutStrLn writeHandle newLine
-    hClose writeHandle
-    hClose readHandle
-    _ <- begin.show $ "Finished making AHG"
-    return ()
+customizeFile :: String -> String -> String -> IO ()
+customizeFile dataToInject replaceToken templateFile = do
+        begin.show $ "Starting to make: "++templateFile
+        contents <- readFile templateFile
+        
+        -- Force strict evaluation, otherwise handle is in semi-closed state so you 
+        -- cannot write to the file
+        length contents `seq` (return ())
+        let newLine = replace replaceToken dataToInject contents
+        writeFile templateFile newLine
+        begin.show $ "Finished making file"
+        
+customizeAndCreateFile :: String -> String -> String -> String -> IO ()
+customizeAndCreateFile dataToInject replaceToken templateFile customizedFile = do
+        begin.show $ "Starting to make: "++customizedFile
+        readHandle <- openFile templateFile ReadMode
+        writeHandle <- openFile customizedFile WriteMode
+        contents <- hGetContents readHandle
+        let newLine = replace replaceToken dataToInject contents
+        hPutStrLn writeHandle newLine
+        hClose writeHandle
+        hClose readHandle
+        begin.show $ "Finished making file"
+        -- return customizedFile
+    
+        
+makeAHG :: String -> String -> String -> String -> IO String
+makeAHG hwkNum  ahgHwk currentDir workingDir = do
+    let templateFile = currentDir++"/AHGTemplate.hs"
+    let customFile = workingDir++"/"++ahgHwk
+    let replaceToken = "{{HwkNum}}"
+    customizeAndCreateFile hwkNum replaceToken templateFile customFile
+    return customFile
+    
 
 runExe :: String -> String -> String -> IO ()
-runExe ahgHwkExe repoDir currentDir = do 
+runExe ahgHwkExe repoDir workingDir = do 
                 -- currentDir <- getCurrentDirectory
 		_ <- begin.show $ "running executable"
 		_ <- begin.show $ "Passing repo dir to AHGTemplate: "++repoDir
-                (exitCode,stdOut,stdErr) <- readProcessWithExitCode (currentDir++"/"++ahgHwkExe) [repoDir] ""
+                (exitCode,stdOut,stdErr) <- readProcessWithExitCode (workingDir++"/"++ahgHwkExe) [repoDir] ""
                 case exitCode of
                     ExitSuccess -> do
 		    		   _ <- begin.show $ "Successfully ran executable"
@@ -102,10 +125,10 @@ listUser = do
 		return ()
                     
 makeExe :: String -> String -> IO ()
-makeExe file currentDir = do
+makeExe file workingDir = do
 	        _ <- begin.show $ "making executable"
-		_ <- begin.show $ "File being made into executable: "++currentDir++"/"++file
-                (exitCode,stdOut,stdErr) <- readProcessWithExitCode ("ghc") ["--make",(currentDir++"/"++file)] ""
+		_ <- begin.show $ "File being made into executable: "++workingDir++"/"++file
+                (exitCode,stdOut,stdErr) <- readProcessWithExitCode ("ghc") ["--make",(workingDir++"/"++file)] ""
                 case exitCode of
                     ExitSuccess -> do
 		    		   _ <- begin.show $ "Executable made successfully"
