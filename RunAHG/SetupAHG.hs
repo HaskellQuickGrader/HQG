@@ -93,7 +93,7 @@ customizeAndCreateFile dataToInject replaceToken templateFile customizedFile = d
 makeAHG :: String -> String -> String -> String -> IO String
 makeAHG hwkNum  ahgHwk currentDir workingDir = do
     let templateFile = currentDir++"/AHGTemplate.hs"
-    let customFile = workingDir++"/"++ahgHwk
+    let customFile = workingDir++ahgHwk
     let replaceToken = "{{HwkNum}}"
     customizeAndCreateFile hwkNum replaceToken templateFile customFile
     return customFile
