@@ -22,7 +22,7 @@ runGitPush gitUrl repoFolder = do
 getGitUrlWithCreds :: String -> String -> String -> Int -> String
 getGitUrlWithCreds usrname pswd [] slashCount = []
 getGitUrlWithCreds usrname pswd gitUrl@(x:xs) slashCount | x == '/' = if(slashCount == 1)
-                                                                        then usrname++":"++pswd++"@"++xs
+                                                                        then x:usrname++":"++pswd++"@"++xs
                                                                         else x:getGitUrlWithCreds usrname pswd xs (slashCount + 1)
                                                          | otherwise = x:getGitUrlWithCreds usrname pswd xs slashCount
                                   
