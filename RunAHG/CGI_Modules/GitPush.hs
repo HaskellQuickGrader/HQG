@@ -8,7 +8,7 @@ import CGI_Modules.TransferData
 
 runGitPush :: String -> String -> IO ()
 runGitPush gitUrl repoFolder = do   
-    (exitCode,standardOut,standardErr) <- readProcessWithExitCode "CGI_Modules/./PushToRepo.sh" [gitUrl] ""
+    (exitCode,standardOut,standardErr) <- readProcessWithExitCode "CGI_Modules/./PushToRepo.sh" [gitUrl, repoFolder] ""
     case exitCode of
       ExitSuccess -> do
                 _ <- begin.show $ "Pushing grade report successful"

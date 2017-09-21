@@ -48,11 +48,11 @@ runQuickCheck test@(points, prop) = do
         _ -> undefined
         
 moveReportToRepo :: String -> String -> IO ()
-moveReportToRepo repoDir currentDir = do
+moveReportToRepo repoDir workingDir = do
 		 	 _ <- begin.show $ "About to move grade report to repo."
 		 	 _ <- begin.show $ "Repo folder: "++repoDir
-			 _ <- begin.show $ "Current Dir: "++currentDir
-			 copyFile (currentDir++"/GradeReport.txt") (repoDir++"/GradeReport.txt")
+			 _ <- begin.show $ "Working Dir: "++workingDir
+			 copyFile (workingDir++"GradeReport.txt") (repoDir++"GradeReport.txt")
 			 return ()
 
 moveSolutionFromRepo :: String -> String -> IO ()

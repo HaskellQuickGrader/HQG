@@ -90,11 +90,6 @@ runAHGSetup url hwkNum repoFolder studentName = do
                    _ <- liftIO.begin.show $ "Finished grading homework, pushing grade report to repo"
                    let gitUrl = getGitUrlWithCreds "root" "password" url 0
                    _ <- liftIO $ runGitPush gitUrl repoFolder
-                   -- _ <- liftIO.gitAddGradeReport $ repoFolder
-                   -- _ <- liftIO $ gitCommit  "Pushing grade report." repoFolder
-                   
-                   -- _ <- liftIO.begin.show $ "Git url for pushing repo: "++gitUrl
-                   -- _ <- liftIO $ gitPushGradeReport url repoFolder
                    output ""
        _ -> do
              _ <- liftIO.begin.show $ stndOut
