@@ -64,16 +64,17 @@ moveSolutionFromRepo solutionRepoPath solutionWorkingPath = do
 			 return ()
         
 main = do
-    (x:xs) <- getArgs
-    let reportFolder = "Hwk{{HwkNum}}"  -- Report folder and student's solution file have same name
+    (x:y:xs) <- getArgs
+    let repoFolder = x
+    let workingDir = y
+    let hwkName = "Hwk{{HwkNum}}"  -- Report folder and student's solution file have same name
     currentDir <- getCurrentDirectory
     _ <- begin.show $ "From AHG_Hwk1 - Current directory: "++currentDir
-    _ <- begin.show $ "Repo Dir: "++x
-    let reportFolderPath = currentDir++"/Hwk/"++reportFolder
+    _ <- begin.show $ "Repo Dir: "++repoFolder
+    let reportFolderPath = workingDir++hwkName
     _ <- begin.show $ "Report Folder: "++reportFolderPath
-    moveSolutionFromRepo (x++reportFolder++".hs") (reportFolderPath++"/"++reportFolder++".hs")
+    moveSolutionFromRepo (repoFolder++hwkName++".hs") (workingDir++hwkName++".hs")
     _ <- begin.show $ "Solution moved from repo, making grade report"
-    makeGradeReport $ reportFolderPath++"/"
+    makeGradeReport $ workingDir
     _ <- begin.show $ "Grade report made, moving back to repo"
-    _ <- begin.show $ "Repo path?: "++x
-    moveReportToRepo x reportFolderPath
+    moveReportToRepo repoFolder reportFolderPath
