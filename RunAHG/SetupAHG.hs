@@ -44,7 +44,7 @@ main = do
     customizeFile studentName "{{Name}}" customAHG
     
     -- Make and run executable
-    makeExe ahgHwk currentDir
+    makeExe ahgHwk workingDir
     runExe ahgHwkExe fullRepoPath workingDir
 
 
@@ -104,7 +104,7 @@ runExe ahgHwkExe repoDir workingDir = do
                 -- currentDir <- getCurrentDirectory
 		_ <- begin.show $ "running executable"
 		_ <- begin.show $ "Passing repo dir to AHGTemplate: "++repoDir
-                (exitCode,stdOut,stdErr) <- readProcessWithExitCode (workingDir++"/"++ahgHwkExe) [repoDir] ""
+                (exitCode,stdOut,stdErr) <- readProcessWithExitCode (workingDir++ahgHwkExe) [repoDir] ""
                 case exitCode of
                     ExitSuccess -> do
 		    		   _ <- begin.show $ "Successfully ran executable"
@@ -130,7 +130,7 @@ makeExe :: String -> String -> IO ()
 makeExe file workingDir = do
 	        _ <- begin.show $ "making executable"
 		_ <- begin.show $ "File being made into executable: "++workingDir++"/"++file
-                (exitCode,stdOut,stdErr) <- readProcessWithExitCode ("ghc") ["--make",(workingDir++"/"++file)] ""
+                (exitCode,stdOut,stdErr) <- readProcessWithExitCode ("ghc") ["--make",(workingDir++file)] ""
                 case exitCode of
                     ExitSuccess -> do
 		    		   _ <- begin.show $ "Executable made successfully"
