@@ -71,10 +71,9 @@ main = do
     currentDir <- getCurrentDirectory
     _ <- begin.show $ "From AHG_Hwk1 - Current directory: "++currentDir
     _ <- begin.show $ "Repo Dir: "++repoFolder
-    let reportFolderPath = workingDir++hwkName
-    _ <- begin.show $ "Report Folder: "++reportFolderPath
+    _ <- begin.show $ "Report Folder: "++workingDir
     moveSolutionFromRepo (repoFolder++hwkName++".hs") (workingDir++hwkName++".hs")
     _ <- begin.show $ "Solution moved from repo, making grade report"
     makeGradeReport $ workingDir
     _ <- begin.show $ "Grade report made, moving back to repo"
-    moveReportToRepo repoFolder reportFolderPath
+    moveReportToRepo repoFolder workingDir
