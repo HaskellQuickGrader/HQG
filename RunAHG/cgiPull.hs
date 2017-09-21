@@ -88,7 +88,7 @@ runAHGSetup url hwkNum repoFolder studentName = do
     case extCode of
        ExitSuccess -> do 
                    _ <- liftIO.begin.show $ "Finished grading homework, pushing grade report to repo"
-                   let gitUrl = getGitUrlWithCreds "root" "password" url 0
+                   let gitUrl = ("http://"++getGitUrlWithCreds) "root" "password" url 0
                    _ <- liftIO $ runGitPush gitUrl repoFolder
                    output ""
        _ -> do
