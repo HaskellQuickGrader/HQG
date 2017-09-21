@@ -4,6 +4,7 @@ GITURL=$1
 REPOFOLDER=$2
 echo "Setting git global config username and email" >> output.txt
 echo "Repo folder about to push from:"$REPOFOLDER >> output.txt
+echo "Git url:"$GITURL >> output.txt
 export HOME=/var/www
 echo $HOME >> output.txt
 git config --global user.name "michael"
