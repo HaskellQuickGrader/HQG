@@ -104,7 +104,7 @@ runExe ahgHwkExe repoDir workingDir = do
                 -- currentDir <- getCurrentDirectory
 		_ <- begin.show $ "running executable"
 		_ <- begin.show $ "Passing repo dir to AHGTemplate: "++repoDir
-                (exitCode,stdOut,stdErr) <- readProcessWithExitCode (workingDir++ahgHwkExe) [repoDir] ""
+                (exitCode,stdOut,stdErr) <- readProcessWithExitCode (workingDir++ahgHwkExe) [repoDir, workingDir] ""
                 case exitCode of
                     ExitSuccess -> do
 		    		   _ <- begin.show $ "Successfully ran executable"
