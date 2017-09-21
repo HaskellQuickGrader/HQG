@@ -1,8 +1,5 @@
 #!/bin/bash
 REPOPATH=$1
-HWKNUM=$2
-REPOPATH+="Hwk_$HWKNUM"
-#REPOPATH+=$HWKNUM
 echo "Setting git global config username and email" >> output.txt
 echo "Full repo path: $REPOPATH" >> output.txt
 export HOME=/var/www
