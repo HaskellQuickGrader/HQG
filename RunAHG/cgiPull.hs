@@ -61,7 +61,7 @@ cgiMain = do
                       then do 
                             -- Pull student's solution and put it in their repo
 			    _ <- liftIO.begin.show $ hwkNum
-                            gitStudentRepo studentRepo
+                            gitStudentRepo studentRepo fullBranch
                             runAHGSetup url (show hwkNum) studentRepo studentName
                       else output ""
                     output ""
@@ -82,9 +82,9 @@ getHwkNumber branch = do
             else ("-1", tokens !! 2)
                 
 gitStudentRepo :: String -> CGI CGIResult
-gitStudentRepo repoPath = do
+gitStudentRepo repoPath branch = do
     _ <- liftIO.begin.show $ "Calling bash script"
-    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "CGI_Modules/./GitStudentRepo.sh" [repoPath] ""
+    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "CGI_Modules/./GitStudentRepo.sh" [repoPath, branch] ""
     case extCode of
        ExitSuccess -> do 
                    _ <- liftIO.begin.show $ "Bash script finished"
