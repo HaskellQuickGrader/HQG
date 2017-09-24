@@ -81,7 +81,7 @@ getHwkNumber branch = do
             then (tokens !! 1, tokens !! 2)
             else ("-1", tokens !! 2)
                 
-gitStudentRepo :: String -> CGI CGIResult
+gitStudentRepo :: String -> String ->  CGI CGIResult
 gitStudentRepo repoPath branch = do
     _ <- liftIO.begin.show $ "Calling bash script"
     (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "CGI_Modules/./GitStudentRepo.sh" [repoPath, branch] ""
