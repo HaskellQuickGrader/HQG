@@ -108,6 +108,8 @@ runExe ahgHwkExe repoDir workingDir = do
                 case exitCode of
                     ExitSuccess -> do
 		    		   _ <- begin.show $ "Successfully ran executable"
+                       _ <- begin.show $ "Deleting working directory"
+                       removeDirectoryRecursive workingDir
 		    		   return ()
                     _ -> do
 		      	   _ <- begin.show $ "Unsuccessfully ran exectuable"

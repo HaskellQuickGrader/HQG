@@ -4,6 +4,8 @@ import Network.CGI
 import qualified Network.CGI.Protocol as NCP
 import System.Process
 import System.Exit
+import Data.List.Split
+import qualified Data.Time.LocalTime as LT
 import Control.Monad.Trans.Class
 import CGI_Modules.TransferData
 import CGI_Modules.ParseUserInfo
@@ -13,6 +15,11 @@ import qualified Data.ByteString.Lazy.Char8 as B
 
 cgiMain :: CGI CGIResult
 cgiMain = do
+        -- Place date at top of log file 
+        localTime <- liftIO $ LT.getZonedTime
+        _ <- liftIO.begin.show $ ""
+        _ <- liftIO.begin.show $ "NEW LOG ENTRY: "++show localTime
+        
         --get header and check for secret token authorization
         header <- requestHeader "X-Gitlab-Token"
         case header of
@@ -28,8 +35,15 @@ cgiMain = do
                     -- The branch name that was just pushed is not expressly given
                     -- instead we have to parse it out from "ref"
                     let branchRef = ref user         
-                    let branch = getBranchName branchRef 0 
-                    _ <- liftIO.begin.show $ "Pulling on branch name: "++branch
+                    let fullBranch = getBranchName branchRef 0
+                    
+                    -- Homework number is not simply parsed from data received when 
+                    -- the student pushes, instead it is nested in the branch name
+                    -- The branch naming convention is as follows:
+                    -- Hwk-<Number>-solution
+                    let (hwkNum, branch) = getHwkNumber $ fullBranch
+                    _ <- liftIO.begin.show $ "Homework number: "++ show hwkNum
+                    _ <- liftIO.begin.show $ "Pulling on branch name: "++fullBranch
                     let url = git_http_url ((repository user) :: Repo)
                                         
                     -- Repo folder structure:
@@ -41,10 +55,6 @@ cgiMain = do
                     let classRepo = repoBase++className++"/"
                     let studentRepo = classRepo++studentName++"/"
                     
-                    -- Homework number is not simply parsed from data received when 
-                    -- student pushes, instead commit message must only contain homework number
-                    let hwkNum = getHwkNumber $ commits user
-                    _ <- liftIO.begin.show $ "Homework number: "++ show hwkNum
                     _ <- liftIO.begin.show $ "Student's repo path: "++studentRepo
                     
                     if(branch == "solution" && hwkNum /= (-1))    -- only pull and grade on "solution" branch
@@ -59,12 +69,17 @@ cgiMain = do
                 _ <- liftIO.begin.show $ "You are not authenticated."
                 output ""
                 
-getHwkNumber :: [Commit] -> Int
-getHwkNumber [] = (-1)    -- indicates there was no homework number as a commit
-getHwkNumber (c:cts) = case NCP.maybeRead (message c) :: Maybe Int of
-                Just num -> num
-                Nothing -> getHwkNumber cts
-                
+getHwkNumber :: String -> (Int, String)
+getHwkNumber branch = do
+    let (hwkNum, solutionBranch) = getNum branch
+    (read hwkNum :: Int, solutionBranch)
+ where 
+    getNum :: String -> (String,String)
+    getNum branch = do
+        let tokens = splitOn "-" branch
+        if (length tokens == 3)
+            then (tokens !! 1, tokens !! 2)
+            else ("-1", tokens !! 2)
                 
 gitStudentRepo :: String -> CGI CGIResult
 gitStudentRepo repoPath = do
