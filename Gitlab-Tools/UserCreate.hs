@@ -26,8 +26,7 @@ apiEndpoint = getEnv apiEndpointVar
 
 data User = User {
       email :: String,
-      password :: String,
-      rest_password :: String,
+      reset_password :: String,
       username :: String,
       name :: String,
       projects_limit :: String,
@@ -43,11 +42,10 @@ data Resp = Resp {
 instance FromJSON Resp
 
 userToParams :: String -> User -> [(String,String)]
-userToParams pt (User e p rp u n pl a cg cp) =
+userToParams pt (User e rp u n pl a cg cp) =
     [("private_token",pt),
      ("email",e),
-     ("password",p),
-     ("rest_password",rp),
+     ("reset_password",rp),
      ("username",u),
      ("name",n),
      ("projects_limit",pl),
