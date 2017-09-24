@@ -78,15 +78,15 @@ response user = request user
                    >>= httpLBS
                    >>= (\r -> return $ ((decode $ C.responseBody r) :: Maybe Resp))
 
-responses :: (Maybe Resp -> a) -> [User] -> IO [a]
+responses :: (String -> Maybe Resp -> a) -> [User] -> IO [a]
 responses f [] = return []
 responses f (u:urs) = do
   r <- response u
   rs <- responses f urs
-  return $ (f r) : rs
+  return $ (f (name u) r) : rs
 
-respToStr :: Maybe Resp -> String
-respToStr Nothing = "Successfully Created User"
-respToStr (Just (Resp m)) = m
+respToStr :: String -> Maybe Resp -> String
+respToStr n Nothing = n++": Successfully Created User"
+respToStr _ (Just (Resp m)) = m
 
 
