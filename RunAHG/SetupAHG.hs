@@ -107,10 +107,10 @@ runExe ahgHwkExe repoDir workingDir = do
                 (exitCode,stdOut,stdErr) <- readProcessWithExitCode (workingDir++ahgHwkExe) [repoDir, workingDir] ""
                 case exitCode of
                     ExitSuccess -> do
-		    		   _ <- begin.show $ "Successfully ran executable"
+		       _ <- begin.show $ "Successfully ran executable"
                        _ <- begin.show $ "Deleting working directory"
                        removeDirectoryRecursive workingDir
-		    		   return ()
+		       return ()
                     _ -> do
 		      	   _ <- begin.show $ "Unsuccessfully ran exectuable"
                            _ <- begin.show $ "Standard out: "++ (show stdOut)
