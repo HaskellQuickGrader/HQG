@@ -53,25 +53,22 @@ userToParams pt (User e rp u n pl a cg cp) =
      ("can_create_group",cg),
      ("can_create_project",cp)]
 
-requestURL :: User -> IO String
-requestURL user = url >>= return.exportURL
+requestURL :: URL -> String -> User -> String
+requestURL u pt user = exportURL url
  where
-   url :: IO URL
-   url = do     
-     pt <- privateToken
-     gurl <- apiEndpoint
-     let iURL = importURL gurl
-     return $ case iURL of
-                Just u -> u { url_params = userToParams pt user,
-                              url_path = url_path u ++ "/users"
-                            }
-                _ -> error "GITLAB_API_ENDPOINT not set"
+   url :: URL
+   url = u { url_params = userToParams pt user,
+             url_path = url_path u ++ "/users" }           
 
 request :: User -> IO Request
 request user = do
-   url <- requestURL user
-   iRep <- parseRequest url
-   return (iRep {C.method = renderMethod (Right POST)})
+   pt <- privateToken
+   gurl <- apiEndpoint  
+   case (importURL gurl) of
+     Just u -> do let url = requestURL u pt user
+                  iRep <- parseRequest url
+                  return (iRep {C.method = renderMethod (Right POST)})
+     Nothing -> error "GITLAB_API_ENDPOINT not set correctly"
           
 response :: User -> IO (Maybe Resp)
 response user = request user
