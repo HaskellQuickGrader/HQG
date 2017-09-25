@@ -11,7 +11,7 @@ import GHC.Generics
 import Data.Aeson
 import Data.Aeson.Types
 import Data.Text as T
-import Data.ByteString.Lazy.Char8 as CH
+import Data.ByteString.Lazy.Char8 as CH hiding (putStrLn)
 
 privateTokenVar :: String
 privateTokenVar = "GITLAB_API_PRIVATE_TOKEN"
@@ -46,6 +46,7 @@ request toP q x = do
    gurl <- apiEndpoint  
    case (importURL gurl) of
      Just u -> do let url = requestURL toP q u pt x
+                  putStrLn.show $ url
                   iRep <- parseRequest url
                   return (iRep {C.method = renderMethod (Right POST)})
      Nothing -> error "GITLAB_API_ENDPOINT not set correctly"       
@@ -74,7 +75,7 @@ decodeEResp (Right r) = flip parseEither r $ (\o -> do
   return (EResp e))
 decodeEResp (Left e) = (Left e)
            
-decodeGLResp :: (Either String Object -> Either String a) -- Decoder for a particular respose type a
+decodeGLResp :: (Either String Object -> Either String a) -- Decoder for a particular respose type
              -> ByteString                                -- JSON that needs decoding
              -> Either String (Either ErrorResp a)        -- Either an error message or the parsed JSON.
 decodeGLResp aDecode s = case (aDecode eo) of

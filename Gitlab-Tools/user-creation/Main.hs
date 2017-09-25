@@ -5,7 +5,8 @@ import Data.List.Split
 
 import User
 import Query
-import UserCreate
+import qualified UserCreate as UC
+import qualified ProjectCreate as PC
 import UserParser
 
 createUsers :: FilePath -> IO (String, [User])
@@ -13,13 +14,15 @@ createUsers file = do
          ls <- readFile file >>= return.lines
          let ls' = map ((splitOn "|").dropSpaces) ls
          users <- buildUsers ls'
-         rsp <- responses defaultResp users
-         let rsp' = processRsp users rsp
+         rsp <- UC.responses defaultResp users
+         let rsp'@(m,users') = processRsp users rsp
+         rsp'' <- PC.responses defaultResp users'
+         error.show $ rsp''
          return rsp'
  where
    -- Collects all the Gitlab error messages, and updates each
    -- succefully created user with their uid:
-   processRsp :: [User] -> [Either String SResp] -> (String, [User])
+   processRsp :: [User] -> [Either String UC.SResp] -> (String, [User])
    processRsp _ [] = ("",[])
    processRsp users ((Right (um,uid)):rest) =      
        case musers of

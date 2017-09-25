@@ -36,7 +36,7 @@ userToParams pt (User e rp u n pl a cg cp _ _ _ _ _) =
      ("admin",a),
      ("can_create_group",cg),
      ("can_create_project",cp)]
-   
+
 response :: User -> IO (Either String (Either ErrorResp SResp))
 response user = request userToParams "/users" user
                    >>= httpLBS
