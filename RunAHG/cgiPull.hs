@@ -55,6 +55,7 @@ cgiMain = do
                     let repoBase = "/usr/lib/cgi-bin/Repos/"
                     let classRepo = repoBase++className++"/"
                     let studentRepo = classRepo++studentName++"/"
+                    let hwkRepoFolder = studentRepo++"Hwk_"++hwkNum
                     
                     liftIO.begin.show $ "Student's repo path: "++studentRepo
                     
@@ -62,7 +63,7 @@ cgiMain = do
                       then do 
                             -- Pull student's solution and put it in their repo
                             
-                            reportExists <- liftIO $ checkForGradeReport studentRepo
+                            reportExists <- liftIO $ checkForGradeReport hwkRepoFolder
                             liftIO.begin.show $ "Homework number: "++show hwkNum
                             if(not reportExists)
                               then 
