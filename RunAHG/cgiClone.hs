@@ -3,6 +3,7 @@ import Network.CGI
 import System.Process
 import System.Exit
 import System.Directory
+import qualified Data.Time.LocalTime as LT
 import CGI_Modules.TransferData
 import CGI_Modules.ParseSystemEventInfo
 import qualified Data.ByteString.Lazy.Char8 as B
@@ -20,6 +21,11 @@ composeCloneURL (x:xs) countColon countSlash | x == ':' = if (countColon == 1)
 
 cgiMain :: CGI CGIResult
 cgiMain = do
+-- Place date at top of log file 
+        localTime <- liftIO $ LT.getZonedTime
+        _ <- liftIO.begin.show $ ""
+        _ <- liftIO.begin.show $ "NEW LOG ENTRY: "++show localTime
+        
         --get header and check for secret token authorization
         headerToken <- requestHeader "X-Gitlab-Token"
         case headerToken of

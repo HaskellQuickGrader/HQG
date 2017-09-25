@@ -3,7 +3,10 @@
 import Network.CGI
 import qualified Network.CGI.Protocol as NCP
 import System.Process
+import qualified System.Directory as SD
 import System.Exit
+import Data.List.Split
+import qualified Data.Time.LocalTime as LT
 import Control.Monad.Trans.Class
 import CGI_Modules.TransferData
 import CGI_Modules.ParseUserInfo
@@ -13,6 +16,11 @@ import qualified Data.ByteString.Lazy.Char8 as B
 
 cgiMain :: CGI CGIResult
 cgiMain = do
+        -- Place date at top of log file 
+        localTime <- liftIO $ LT.getZonedTime
+        liftIO.begin.show $ ""
+        liftIO.begin.show $ "NEW LOG ENTRY: "++show localTime
+        
         --get header and check for secret token authorization
         header <- requestHeader "X-Gitlab-Token"
         case header of
@@ -21,15 +29,22 @@ cgiMain = do
             if(h == "eNbbFFBqgBq5TSGdUtWr9gw4WXptmKbKQKp3P8bPAksYyKvx")
                 then do
                     -- Get info from git push
-                    _ <- listUser
+                    listUser
                     inputs <- getBody
                     user <- parseJSON $ B.pack inputs
                     
                     -- The branch name that was just pushed is not expressly given
                     -- instead we have to parse it out from "ref"
                     let branchRef = ref user         
-                    let branch = getBranchName branchRef 0 
-                    _ <- liftIO.begin.show $ "Pulling on branch name: "++branch
+                    let fullBranch = getBranchName branchRef 0
+                    
+                    -- Homework number is not simply parsed from data received when 
+                    -- the student pushes, instead it is nested in the branch name
+                    -- The branch naming convention is as follows:
+                    -- Hwk-<Number>-solution
+                    let (hwkNum, branch) = getHwkNumber $ fullBranch
+                    liftIO.begin.show $ "Homework number: "++ show hwkNum
+                    liftIO.begin.show $ "Pulling on branch name: "++fullBranch
                     let url = git_http_url ((repository user) :: Repo)
                                         
                     -- Repo folder structure:
@@ -40,60 +55,80 @@ cgiMain = do
                     let repoBase = "/usr/lib/cgi-bin/Repos/"
                     let classRepo = repoBase++className++"/"
                     let studentRepo = classRepo++studentName++"/"
-                    
-                    -- Homework number is not simply parsed from data received when 
-                    -- student pushes, instead commit message must only contain homework number
-                    let hwkNum = getHwkNumber $ commits user
-                    _ <- liftIO.begin.show $ "Homework number: "++ show hwkNum
-                    _ <- liftIO.begin.show $ "Student's repo path: "++studentRepo
+                    let hwkRepoFolder = studentRepo++"Hwk_"++show hwkNum++"/"
+
+		    liftIO.begin.show $ "Checking for grade report in folder:"++hwkRepoFolder
+                    liftIO.begin.show $ "Student's repo path: "++studentRepo
                     
                     if(branch == "solution" && hwkNum /= (-1))    -- only pull and grade on "solution" branch
                       then do 
                             -- Pull student's solution and put it in their repo
-			    _ <- liftIO.begin.show $ hwkNum
-                            gitStudentRepo studentRepo
-                            runAHGSetup url (show hwkNum) studentRepo studentName
+                            
+                            reportExists <- liftIO $ checkForGradeReport hwkRepoFolder
+			    liftIO.begin.show $ "Grade report exists: "++show reportExists
+                            liftIO.begin.show $ "Homework number: "++show hwkNum
+                            if(not reportExists)
+                              then 
+                                do
+                                 gitStudentRepo studentRepo fullBranch
+                                 runAHGSetup url (show hwkNum) studentRepo studentName
+                              else
+                                do
+                                liftIO.begin.show $ "student pushed homework but gradereport already exists."
+                                output ""
                       else output ""
                     output ""
             else do
                 _ <- liftIO.begin.show $ "You are not authenticated."
                 output ""
+
+-- This prevents students from pushing their homeowork multiple times                
+checkForGradeReport :: String -> IO Bool
+checkForGradeReport repo = do
+    let gradeReportPath = repo++"GradeReport.txt"
+    SD.doesFileExist gradeReportPath
+    
                 
-getHwkNumber :: [Commit] -> Int
-getHwkNumber [] = (-1)    -- indicates there was no homework number as a commit
-getHwkNumber (c:cts) = case NCP.maybeRead (message c) :: Maybe Int of
-                Just num -> num
-                Nothing -> getHwkNumber cts
+getHwkNumber :: String -> (Int, String)
+getHwkNumber branch = do
+    let (hwkNum, solutionBranch) = getNum branch
+    (read hwkNum :: Int, solutionBranch)
+ where 
+    getNum :: String -> (String,String)
+    getNum branch = do
+        let tokens = splitOn "-" branch
+        if (length tokens == 3)
+            then (tokens !! 1, tokens !! 2)
+            else ("-1", tokens !! 2)
                 
-                
-gitStudentRepo :: String -> CGI CGIResult
-gitStudentRepo repoPath = do
-    _ <- liftIO.begin.show $ "Calling bash script"
-    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "CGI_Modules/./GitStudentRepo.sh" [repoPath] ""
+gitStudentRepo :: String -> String ->  CGI CGIResult
+gitStudentRepo repoPath branch = do
+    liftIO.begin.show $ "Calling bash script"
+    (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "CGI_Modules/./GitStudentRepo.sh" [repoPath, branch] ""
     case extCode of
        ExitSuccess -> do 
-                   _ <- liftIO.begin.show $ "Bash script finished"
+                   liftIO.begin.show $ "Bash script finished"
                    output ""
        _ -> do
-             _ <- liftIO.begin.show $ "Standard out:"++stndOut
-             _ <- liftIO.begin.show $ "Standard error:"++stndErr
+             liftIO.begin.show $ "Standard out:"++stndOut
+             liftIO.begin.show $ "Standard error:"++stndErr
              output ""  
                  
                 
 runAHGSetup :: String -> String -> String -> String -> CGI CGIResult
 runAHGSetup url hwkNum repoFolder studentName = do
-    _ <- liftIO.begin.show $ "Running AHG Setup"
-    _ <- liftIO.begin.show $ "Repo folder used for git add, commit, and push: "++repoFolder
+    liftIO.begin.show $ "Running AHG Setup"
+    liftIO.begin.show $ "Repo folder used for git add, commit, and push: "++repoFolder
     (extCode,stndOut,stndErr) <- liftIO $ readProcessWithExitCode "/usr/lib/cgi-bin/AHG/RunAHG/./SetupAHG" [hwkNum, repoFolder, studentName] ""
     case extCode of
        ExitSuccess -> do 
-                   _ <- liftIO.begin.show $ "Finished grading homework, pushing grade report to repo"
+                   liftIO.begin.show $ "Finished grading homework, pushing grade report to repo"
                    let gitUrl = getGitUrlWithCreds "root" "password" url 0
-                   _ <- liftIO $ runGitPush gitUrl repoFolder
+                   liftIO $ runGitPush gitUrl repoFolder
                    output ""
        _ -> do
-             _ <- liftIO.begin.show $ stndOut
-             _ <- liftIO.begin.show $ stndErr
+             liftIO.begin.show $ stndOut
+             liftIO.begin.show $ stndErr
              output ""
   
                                    
@@ -115,10 +150,10 @@ listUser = do
 	 (exitCode, stnOut, stdErr) <- liftIO $ readProcessWithExitCode "whoami" [] ""
 	 case exitCode of
 	   ExitSuccess -> do
-	   	       _ <- liftIO.begin.show $ "Current user: "++stnOut
+	   	       liftIO.begin.show $ "Current user: "++stnOut
 		       output ""
 	   _ -> do
-	     _ <- liftIO.begin.show $ "standard error: "++stdErr
+	     liftIO.begin.show $ "standard error: "++stdErr
 	     output ""
                                
 
