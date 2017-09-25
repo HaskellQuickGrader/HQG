@@ -55,8 +55,9 @@ cgiMain = do
                     let repoBase = "/usr/lib/cgi-bin/Repos/"
                     let classRepo = repoBase++className++"/"
                     let studentRepo = classRepo++studentName++"/"
-                    let hwkRepoFolder = studentRepo++"Hwk_"++show hwkNum
-                    
+                    let hwkRepoFolder = studentRepo++"Hwk_"++show hwkNum++"/"
+
+		    liftIO.begin.show $ "Checking for grade report in folder:"++hwkRepoFolder
                     liftIO.begin.show $ "Student's repo path: "++studentRepo
                     
                     if(branch == "solution" && hwkNum /= (-1))    -- only pull and grade on "solution" branch
@@ -64,6 +65,7 @@ cgiMain = do
                             -- Pull student's solution and put it in their repo
                             
                             reportExists <- liftIO $ checkForGradeReport hwkRepoFolder
+			    liftIO.begin.show $ "Grade report exists: "++show reportExists
                             liftIO.begin.show $ "Homework number: "++show hwkNum
                             if(not reportExists)
                               then 
