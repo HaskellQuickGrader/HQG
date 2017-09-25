@@ -1,48 +1,32 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleInstances #-}
 module UserCreate where
 
-import GHC.Generics
 import Data.Aeson
 import Data.Aeson.Types
-import System.Environment
-import Network.URL
-import Network.HTTP.Simple
 import qualified Network.HTTP.Client as C
-import Network.HTTP.Types.Method    
+import Network.HTTP.Simple    
+import Data.Text as T
+import Data.ByteString.Lazy.Char8 as CH
 
-privateTokenVar :: String
-privateTokenVar = "GITLAB_API_PRIVATE_TOKEN"
+import User   
+import Query
 
-apiEndpointVar :: String
-apiEndpointVar = "GITLAB_API_ENDPOINT"
+-- Gitlab Success Response: (username,UID)
+type SResp = (String,Integer)
 
-privateToken :: IO String
-privateToken = getEnv privateTokenVar
+getUIDRsp :: Either String Object -> Either String SResp
+getUIDRsp (Right r) = flip parseEither r $ (\o -> do
+  id <- o .: "id"
+  un <- o .: "username"
+  return (un,id))
+getUIDRsp (Left e) = (Left e)
 
-apiEndpoint :: IO String
-apiEndpoint = getEnv apiEndpointVar
-
-data User = User {
-      email :: String,
-      reset_password :: String,
-      username :: String,
-      name :: String,
-      projects_limit :: String,
-      admin :: String,
-      can_create_group :: String,
-      can_create_project :: String
-} deriving (Generic, Show)
-
-data Resp = Resp {
-  message :: String
-} deriving (Generic,Show)
-           
-instance FromJSON Resp
-
+decodeRsp :: ByteString -> Either String (Either ErrorResp SResp)
+decodeRsp b = decodeGLResp getUIDRsp b
+          
 userToParams :: String -> User -> [(String,String)]
-userToParams pt (User e rp u n pl a cg cp) =
+userToParams pt (User e rp u n pl a cg cp _ _ _ _ _) =
     [("private_token",pt),
      ("email",e),
      ("reset_password",rp),
@@ -52,38 +36,17 @@ userToParams pt (User e rp u n pl a cg cp) =
      ("admin",a),
      ("can_create_group",cg),
      ("can_create_project",cp)]
-
-requestURL :: URL -> String -> User -> String
-requestURL u pt user = exportURL url
- where
-   url :: URL
-   url = u { url_params = userToParams pt user,
-             url_path = url_path u ++ "/users" }           
-
-request :: User -> IO Request
-request user = do
-   pt <- privateToken
-   gurl <- apiEndpoint  
-   case (importURL gurl) of
-     Just u -> do let url = requestURL u pt user
-                  iRep <- parseRequest url
-                  return (iRep {C.method = renderMethod (Right POST)})
-     Nothing -> error "GITLAB_API_ENDPOINT not set correctly"
-          
-response :: User -> IO (Maybe Resp)
-response user = request user
+   
+response :: User -> IO (Either String (Either ErrorResp SResp))
+response user = request userToParams "/users" user
                    >>= httpLBS
-                   >>= (\r -> return $ ((decode $ C.responseBody r) :: Maybe Resp))
+                   >>= (\r -> return $ ((decodeRsp $ C.responseBody r) :: Either String (Either ErrorResp SResp)))
 
-responses :: (String -> Maybe Resp -> a) -> [User] -> IO [a]
+responses :: (Either String (Either ErrorResp SResp) -> a) -> [User] -> IO [a]
 responses f [] = return []
 responses f (u:urs) = do
   r <- response u
   rs <- responses f urs
-  return $ (f (name u) r) : rs
+  return $ (f r) : rs
 
-respToStr :: String -> Maybe Resp -> String
-respToStr n Nothing = n++": Successfully Created User"
-respToStr _ (Just (Resp m)) = m
-
-
+ex_rsp = "{\"name\":\"Prof Eades\",\"username\":\"hde\",\"id\":62,\"state\":\"active\",\"avatar_url\":null,\"web_url\":\"http://gitlab.metatheorem.org/hde\",\"created_at\":\"2017-09-24T14:24:09.982Z\",\"bio\":null,\"location\":null,\"skype\":\"\",\"linkedin\":\"\",\"twitter\":\"\",\"website_url\":\"\",\"organization\":null,\"last_sign_in_at\":null,\"confirmed_at\":null,\"last_activity_on\":null,\"email\":\"heades@augusta.edu\",\"color_scheme_id\":1,\"projects_limit\":0,\"current_sign_in_at\":null,\"identities\":[],\"can_create_group\":false,\"can_create_project\":false,\"two_factor_enabled\":false,\"external\":false}"

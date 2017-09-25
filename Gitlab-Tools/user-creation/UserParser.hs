@@ -8,14 +8,13 @@ LANGUAGE
 module UserParser where
 
 import Data.Char
-import Data.List.Split
 import Text.Parsec hiding (Empty)
 import Text.Parsec.Token    
 import Text.Email.Validate
 import qualified Data.ByteString.Char8 as B
-import Crypto.Password
 
-import UserCreate
+import User
+import qualified UserCreate as UC
     
 parseUsername = do
   a <- lower
@@ -30,39 +29,49 @@ parseName = do
   char '$'
   return $ first ++ " " ++ last
 
+parseStrictName = do
+  r <- many (lower <|> upper)
+  char '$'
+  return $ r
+
+parseGroupName = do
+  a <- lower <|> upper
+  r <- many alphaNum
+  char '$'
+  return $ a : r
+
 validateName n = do
   case (parse parseName "" n) of
     Left _ -> Nothing
     Right n -> Just n
 
-validateUserame u = do
-  case (parse parseUsername "" u) of
+validateBool p u = do
+  case (parse p "" u) of
     Left _ -> False
     Right _ -> True
+
+validateUsername = validateBool parseUsername
+validateProjName = validateBool parseStrictName
+validateGroupName = validateBool parseGroupName
          
 validateEmail = isValid.B.pack
 
 dropSpaces :: String -> String
 dropSpaces = filter (not.isSpace)
-
-checkLength l@(a:b:c:[]) = l
-checkLength _ = error "Parse Error: Every line must contain: name, username, and email."
-
-genPass :: IO String
-genPass = generatePassword pass_features
- where
-   pass_features = [Length 8, Include Uppercase, Include Lowercase, Include Digit, Include Symbol]
                 
 buildUsers :: [[String]] -> IO [User]
 buildUsers [] = return []
-buildUsers ([name,username,email]:ls)
-    | (validateUserame (username++"$")) && (validateEmail (email++"$"))
+buildUsers ([name,username,email,groupName,repoName]:ls)
+    | (validateUsername (username++"$")) && (validateEmail (email++"$"))
+                                         && (validateGroupName (groupName++"$"))
+                                         && (validateProjName (repoName++"$"))
     = case (validateName (name++"$")) of
           Nothing -> error "Parse Error: Every line must contain: name, username, and email."
           Just name' -> do rest <- buildUsers ls
                            return $ usr name' : rest
  where
    usr nm = User {
+           -- User Creation:
            email = email,
            reset_password = "true",
            username = username,
@@ -70,11 +79,12 @@ buildUsers ([name,username,email]:ls)
            projects_limit = "0",
            admin = "false",
            can_create_group = "false",
-           can_create_project = "false"
+           can_create_project = "false",
+           -- Project Creation:
+           uid = -1, -- default value meaning unset
+           project_name = repoName,
+           namespace = groupName,
+           issues_enabled = "true",
+           visibility = "private"
          }
-
-createUsers file = do
-  ls <- readFile file >>= return.lines
-  let ls' = map (checkLength.(splitOn "|").dropSpaces) ls
-  users <- buildUsers ls'
-  responses respToStr users
+buildUsers _ = error "Parse Error: Every line must contain: name, username, and email."
