@@ -55,7 +55,7 @@ cgiMain = do
                     let repoBase = "/usr/lib/cgi-bin/Repos/"
                     let classRepo = repoBase++className++"/"
                     let studentRepo = classRepo++studentName++"/"
-                    let hwkRepoFolder = studentRepo++"Hwk_"++hwkNum
+                    let hwkRepoFolder = studentRepo++"Hwk_"++show hwkNum
                     
                     liftIO.begin.show $ "Student's repo path: "++studentRepo
                     
