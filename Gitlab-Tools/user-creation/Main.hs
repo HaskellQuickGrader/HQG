@@ -9,16 +9,15 @@ import qualified UserCreate as UC
 import qualified ProjectCreate as PC
 import UserParser
 
-createUsers :: FilePath -> IO (String, [User])
+createUsers :: FilePath -> IO (String, [User], [Either String PC.SResp])
 createUsers file = do
          ls <- readFile file >>= return.lines
          let ls' = map ((splitOn "|").dropSpaces) ls
          users <- buildUsers ls'
          rsp <- UC.responses defaultResp users
          let rsp'@(m,users') = processRsp users rsp
-         rsp'' <- PC.responses defaultResp users'
-         error.show $ rsp''
-         return rsp'
+         prjs <- PC.responses defaultResp users'
+         return (m,users',prjs)
  where
    -- Collects all the Gitlab error messages, and updates each
    -- succefully created user with their uid:
@@ -41,5 +40,5 @@ main = getArgs >>= process
  where
     process [] = error "A file path must be given."
     process (path:_) = do
-          (e, users) <- createUsers path
+          (e, users, prjs) <- createUsers path
           putStrLn e   

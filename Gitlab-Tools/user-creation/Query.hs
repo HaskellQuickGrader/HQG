@@ -37,19 +37,31 @@ requestURL toP q u pt x = exportURL url
    url = u { url_params = toP pt x,
              url_path = url_path u ++ q }           
 
-request :: (String -> a -> [(String,String)]) -- Private Key -> Add Data -> URL Parameters          
+request :: StdMethod                          -- Type of query, e.g. POST or GET
+        -> (String -> a -> [(String,String)]) -- Private Key -> Add Data -> URL Parameters          
         -> String                             -- Gitlab query string
         -> a                                  -- Data to toP (first arg)
         -> IO Request                         -- The Gitlab request used with httpLBS
-request toP q x = do
+request method toP q x = do
    pt <- privateToken
    gurl <- apiEndpoint  
    case (importURL gurl) of
      Just u -> do let url = requestURL toP q u pt x
-                  putStrLn.show $ url
                   iRep <- parseRequest url
-                  return (iRep {C.method = renderMethod (Right POST)})
+                  return (iRep {C.method = renderMethod (Right method)})
      Nothing -> error "GITLAB_API_ENDPOINT not set correctly"       
+
+postRequest :: (String -> a -> [(String,String)]) -- Private Key -> Add Data -> URL Parameters          
+            -> String                             -- Gitlab query string
+            -> a                                  -- Data to toP (first arg)
+            -> IO Request                         -- The Gitlab request used with httpLBS
+postRequest = request POST
+
+getRequest :: (String -> a -> [(String,String)]) -- Private Key -> Add Data -> URL Parameters          
+            -> String                             -- Gitlab query string
+            -> a                                  -- Data to toP (first arg)
+            -> IO Request                         -- The Gitlab request used with httpLBS
+getRequest = request GET
 
 -- Gitlab Message Response
 data MResp = MResp {
@@ -75,9 +87,9 @@ decodeEResp (Right r) = flip parseEither r $ (\o -> do
   return (EResp e))
 decodeEResp (Left e) = (Left e)
            
-decodeGLResp :: (Either String Object -> Either String a) -- Decoder for a particular respose type
-             -> ByteString                                -- JSON that needs decoding
-             -> Either String (Either ErrorResp a)        -- Either an error message or the parsed JSON.
+decodeGLResp :: FromJSON b => (Either String b -> Either String a)  -- Decoder for a particular respose type
+             -> ByteString                                          -- JSON that needs decoding
+             -> Either String (Either ErrorResp a)                  -- Either an error message or the parsed JSON.
 decodeGLResp aDecode s = case (aDecode eo) of
                            Right aR -> Right (Right aR)
                            Left e1 -> case (decodeMResp eo) of
@@ -86,8 +98,8 @@ decodeGLResp aDecode s = case (aDecode eo) of
                                                      Right eR -> Right (Left (Left eR))
                                                      Left e3 -> Left (e1 ++ "\n" ++ e2 ++ "\n" ++ e3)
  where
-   eo = eitherDecode s :: Either String Object
-
+   eo :: FromJSON c => Either String c
+   eo = eitherDecode s
 
 defaultResp :: Either String (Either ErrorResp a) -> Either String a
 defaultResp (Right (Right r)) = Right r

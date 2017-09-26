@@ -27,3 +27,7 @@ findUser :: [User] -> String -> Maybe User
 findUser [] _ = Nothing
 findUser (u:us) nm | (username u) `strEq` nm = Just u
                    | otherwise = findUser us nm
+
+namespaces :: [User] -> [String]
+namespaces = map namespace
+

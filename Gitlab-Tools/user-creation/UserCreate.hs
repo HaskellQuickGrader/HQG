@@ -4,6 +4,7 @@ module UserCreate where
 
 import Data.Aeson
 import Data.Aeson.Types
+import Network.HTTP.Types    
 import qualified Network.HTTP.Client as C
 import Network.HTTP.Simple    
 import Data.Text as T
@@ -38,7 +39,7 @@ userToParams pt (User e rp u n pl a cg cp _ _ _ _ _) =
      ("can_create_project",cp)]
 
 response :: User -> IO (Either String (Either ErrorResp SResp))
-response user = request userToParams "/users" user
+response user = postRequest userToParams "/users" user
                    >>= httpLBS
                    >>= (\r -> return $ ((decodeRsp $ C.responseBody r) :: Either String (Either ErrorResp SResp)))
 
