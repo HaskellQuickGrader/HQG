@@ -1,7 +1,9 @@
-module CGIClone.Main where
+module Main where
 
 import Network.CGI 
 import System.IO
+import SystemHook.ProjectCreate
+import Query
 
 -- Debugging
 
@@ -28,3 +30,6 @@ cgiMain = do
                                                  liftIO.logStr $ inputs
                                                  output ""
               else output ""
+
+main :: IO ()
+main = runCGI (handleErrors cgiMain)

@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Systemhook.ProjectCreate where
+module SystemHook.ProjectCreate where
 
 import Query
 import Data.Aeson
