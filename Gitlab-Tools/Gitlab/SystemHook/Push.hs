@@ -6,8 +6,6 @@ import Query
 import Data.Aeson
 import Data.Aeson.Types
 import Data.ByteString.Lazy.Char8 as CH
-import qualified Network.HTTP.Client as C
-import Network.HTTP.Simple
 
 data Project = Project {
       name :: String,
