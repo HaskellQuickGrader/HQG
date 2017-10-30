@@ -12,6 +12,7 @@ import Data.Aeson
 import Data.Aeson.Types
 import Data.Text as T
 import Data.ByteString.Lazy.Char8 as CH hiding (putStrLn)
+import Data.String.Combinators
 
 privateTokenVar :: String
 privateTokenVar = "GITLAB_API_PRIVATE_TOKEN"
@@ -75,6 +76,12 @@ data EResp = EResp {
 
 type ErrorResp = Either EResp MResp
 
+appendER :: ErrorResp -> ErrorResp -> ErrorResp
+appendER (Left (EResp e1))  (Left (EResp e2))  = Left  (EResp (e1 $$ e2))
+appendER (Left (EResp e))   (Right (MResp m))  = Left  (EResp (e  $$ m))
+appendER (Right (MResp m))  (Left (EResp e))   = Left  (EResp (m  $$ e))
+appendER (Right (MResp m1)) (Right (MResp m2)) = Right (MResp (m1 $$ m2))
+    
 decodeMResp :: Either String Object -> Either String MResp
 decodeMResp (Right r) = flip parseEither r $ (\o -> do
   m <- o .: "message"
@@ -96,7 +103,7 @@ decodeGLResp aDecode s = case (aDecode eo) of
                                         Right mR -> Right (Left (Right mR))
                                         Left e2 -> case (decodeEResp eo) of
                                                      Right eR -> Right (Left (Left eR))
-                                                     Left e3 -> Left (e1 ++ "\n" ++ e2 ++ "\n" ++ e3)
+                                                     Left e3 -> Left (e1 $$ e2 $$ e3)
  where
    eo :: FromJSON c => Either String c
    eo = eitherDecode s
@@ -106,3 +113,18 @@ defaultResp (Right (Right r)) = Right r
 defaultResp (Right (Left (Right (MResp m)))) = Left m
 defaultResp (Right (Left (Left (EResp e)))) = Left e
 defaultResp (Left e) = Left e
+
+data Sum a b = Injl a | Injr b
+
+(<++>) :: Either String (Either ErrorResp a)
+       -> Either String (Either ErrorResp b)
+       -> Either String (Either ErrorResp (Sum a b))
+(Left m1)         <++> (Left m2)         = Left $ m1 $$ m2
+(Left m)          <++> (Right (Left e))  = Left m
+(Right (Left e))  <++> (Left m)          = Left m
+(Right (Left e1)) <++> (Right (Left e2)) = Right $ Left $ e1 `appendER` e2
+(Left m)          <++> (Right (Right y)) = Right $ Right $ Injr y
+(Right (Left e))  <++> (Right (Right y)) = Right $ Right $ Injr y
+(Right (Right x)) <++> (Left m)          = Right $ Right $ Injl x
+(Right (Right x)) <++> (Right (Left e))  = Right $ Right $ Injl x
+(Right (Right x)) <++> (Right (Right y)) = Left "This is a bug: ambiguous JSON in <++>"

@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module SystemHook.ProjectCreate where
+module SystemHook.ProjectRT where
 
 import Query
 import Data.Aeson
@@ -8,7 +8,7 @@ import Data.ByteString.Lazy.Char8 as CH
 import qualified Network.HTTP.Client as C
 import Network.HTTP.Simple
 
-data ProjectCreated = ProjectCreated {
+data ProjectRT = ProjectRT {
       created_at :: String,
       updated_at :: String,
       event_name :: String,
@@ -17,11 +17,12 @@ data ProjectCreated = ProjectCreated {
       owner_name :: String,
       path :: String,
       path_with_namespace :: String,
-      project_id :: String,
-      project_visibility :: String
+      project_id :: Integer,
+      project_visibility :: String,
+      old_path_with_namespace :: String
 } deriving (Show)
 
-type SResp = ProjectCreated
+type SResp = ProjectRT
 
 getPCRsp :: Either String [Object] -> Either String SResp
 getPCRsp (Right []) = Left "No project created response returned from Gitlab."
@@ -36,9 +37,10 @@ getPCRsp (Right [r]) = flip parseEither r $ (\o -> do
   path_with_namespace <- o .: "path_with_namespace"
   project_id <- o .: "project_id"
   project_visibility <- o .: "project_visibility"
-  return $ ProjectCreated created_at  updated_at event_name name
-                          owner_email owner_name path       path_with_namespace
-                          project_id  project_visibility)
+  old_path_with_namespace <- o .: "old_path_with_namespace"
+  return $ ProjectRT created_at  updated_at event_name name
+                     owner_email owner_name path       path_with_namespace
+                     project_id  project_visibility old_path_with_namespace)
 getPCRsp (Left e) = (Left e)
 
 decodeRsp :: ByteString -> Either String (Either ErrorResp SResp)
