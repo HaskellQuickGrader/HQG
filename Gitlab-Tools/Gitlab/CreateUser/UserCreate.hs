@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleInstances #-}
-module UserCreate where
+module CreateUser.UserCreate where
 
 import Data.Aeson
 import Data.Aeson.Types
@@ -10,7 +10,7 @@ import Network.HTTP.Simple
 import Data.Text as T
 import Data.ByteString.Lazy.Char8 as CH
 
-import User   
+import CreateUser.User   
 import Query
 
 -- Gitlab Success Response: (username,UID)

@@ -24,6 +24,7 @@ data Namespace = Namespace {
 type SResp = Namespace
 
 getNSRsp :: Either String [Object] -> Either String SResp
+getNSRsp (Right []) = Left "No namespace returned from Gitlab."
 getNSRsp (Right [r]) = flip parseEither r $ (\o -> do
   id  <- o .: "id"
   n   <- o .: "name"

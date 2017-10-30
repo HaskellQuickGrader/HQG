@@ -1,13 +1,13 @@
-module Main where
+module CreateUser.Main where
 
 import System.Environment
 import Data.List.Split
 
-import User
 import Query
-import qualified UserCreate as UC
-import qualified ProjectCreate as PC
-import UserParser
+import CreateUser.User
+import qualified CreateUser.UserCreate as UC
+import qualified CreateUser.ProjectCreate as PC
+import CreateUser.UserParser
 
 createUsers :: FilePath -> IO (String, [User], [Either String PC.SResp])
 createUsers file = do
@@ -15,7 +15,7 @@ createUsers file = do
          let ls' = map ((splitOn "|").dropSpaces) ls
          users <- buildUsers ls'
          rsp <- UC.responses defaultResp users
-         let rsp'@(m,users') = processRsp users rsp
+         let (m,users') = processRsp users rsp
          prjs <- PC.responses defaultResp users'
          return (m,users',prjs)
  where

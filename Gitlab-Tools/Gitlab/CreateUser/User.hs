@@ -1,4 +1,4 @@
-module User where
+module CreateUser.User where
 
 import Data.Strings
 

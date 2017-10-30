@@ -5,7 +5,7 @@ LANGUAGE
   TemplateHaskell, 
   FlexibleContexts 
 #-}
-module UserParser where
+module CreateUser.UserParser where
 
 import Data.Char
 import Text.Parsec hiding (Empty)
@@ -13,8 +13,8 @@ import Text.Parsec.Token
 import Text.Email.Validate
 import qualified Data.ByteString.Char8 as B
 
-import User
-import qualified UserCreate as UC
+import CreateUser.User
+import qualified CreateUser.UserCreate as UC
     
 parseUsername = do
   a <- lower
