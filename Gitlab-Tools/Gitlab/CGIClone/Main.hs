@@ -2,8 +2,9 @@ module CGIClone.Main where
 
 import Network.CGI 
 import System.IO
-import SystemHook.ProjectCreate
+import SystemHook
 import Query
+import qualified Data.ByteString.Lazy.Char8 as CH
 
 -- Debugging
 
@@ -19,6 +20,8 @@ secretKey = "GUC#Wwdk6x!5dtrrnb#8W$p%$wMgMd7xCvr$CNHmy#D%Vf&Ux6"
 processSystemHook :: String -> CGI CGIResult
 processSystemHook inputs = do
   liftIO.logStr $ inputs
+  let d = sysHookDecoder $ CH.pack inputs
+  liftIO.logStr.show $ d          
   output ""
 
 processHeader :: Maybe String -> CGI CGIResult

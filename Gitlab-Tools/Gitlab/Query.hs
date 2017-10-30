@@ -115,6 +115,7 @@ defaultResp (Right (Left (Left (EResp e)))) = Left e
 defaultResp (Left e) = Left e
 
 data Sum a b = Injl a | Injr b
+ deriving Show
 
 (<++>) :: Either String (Either ErrorResp a)
        -> Either String (Either ErrorResp b)
