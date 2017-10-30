@@ -21,9 +21,8 @@ data GroupCR = GroupCR {
 
 type SResp = GroupCR
 
-getGroupCRRsp :: Either String [Object] -> Either String SResp
-getGroupCRRsp (Right []) = Left "No project created response returned from Gitlab."
-getGroupCRRsp (Right [r]) = flip parseEither r $ (\o -> do
+getGroupCRRsp :: Either String Object -> Either String SResp
+getGroupCRRsp (Right r) = flip parseEither r $ (\o -> do
   created_at <- o .: "created_at" 
   updated_at <- o .: "updated_at" 
   event_name <- o .: "event_name" 

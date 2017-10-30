@@ -25,9 +25,8 @@ data Team = Team {
 
 type SResp = Team
 
-getTeamRsp :: Either String [Object] -> Either String SResp
-getTeamRsp (Right []) = Left "No project created response returned from Gitlab."
-getTeamRsp (Right [r]) = flip parseEither r $ (\o -> do
+getTeamRsp :: Either String Object -> Either String SResp
+getTeamRsp (Right r) = flip parseEither r $ (\o -> do
   created_at <- o .: "created_at" 
   updated_at <- o .: "updated_at" 
   event_name <- o .: "event_name" 

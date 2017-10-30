@@ -20,9 +20,8 @@ data User = User {
 
 type SResp = User
 
-getUserRsp :: Either String [Object] -> Either String SResp
-getUserRsp (Right []) = Left "No project created response returned from Gitlab."
-getUserRsp (Right [r]) = flip parseEither r $ (\o -> do
+getUserRsp :: Either String Object -> Either String SResp
+getUserRsp (Right r) = flip parseEither r $ (\o -> do
   created_at <- o .: "created_at" 
   updated_at <- o .: "updated_at" 
   event_name <- o .: "event_name" 

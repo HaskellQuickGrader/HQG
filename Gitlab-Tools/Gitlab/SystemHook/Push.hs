@@ -66,9 +66,8 @@ data Push = Push {
 
 type SResp = Push
 
-getPushRsp :: Either String [Object] -> Either String SResp
-getPushRsp (Right []) = Left "No project created response returned from Gitlab."
-getPushRsp (Right [r]) = flip parseEither r $ (\o -> do
+getPushRsp :: Either String Object -> Either String SResp
+getPushRsp (Right r) = flip parseEither r $ (\o -> do
   event_name <- o .: "event_name"
   before <- o .: "before"
   after <- o .: "after"

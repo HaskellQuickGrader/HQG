@@ -24,9 +24,8 @@ data ProjectRT = ProjectRT {
 
 type SResp = ProjectRT
 
-getPCRsp :: Either String [Object] -> Either String SResp
-getPCRsp (Right []) = Left "No project created response returned from Gitlab."
-getPCRsp (Right [r]) = flip parseEither r $ (\o -> do
+getPCRsp :: Either String Object -> Either String SResp
+getPCRsp (Right r) = flip parseEither r $ (\o -> do
   created_at <- o .: "created_at"
   updated_at <- o .: "updated_at"
   event_name <- o .: "event_name"

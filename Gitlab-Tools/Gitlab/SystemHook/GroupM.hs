@@ -24,9 +24,8 @@ data GroupM = GroupM {
 
 type SResp = GroupM
 
-getGroupMRsp :: Either String [Object] -> Either String SResp
-getGroupMRsp (Right []) = Left "No project created response returned from Gitlab."
-getGroupMRsp (Right [r]) = flip parseEither r $ (\o -> do
+getGroupMRsp :: Either String Object -> Either String SResp
+getGroupMRsp (Right r) = flip parseEither r $ (\o -> do
   created_at <- o .: "created_at" 
   updated_at <- o .: "updated_at" 
   event_name <- o .: "event_name" 

@@ -19,9 +19,8 @@ data Key = Key {
 
 type SResp = Key
 
-getKeyRsp :: Either String [Object] -> Either String SResp
-getKeyRsp (Right []) = Left "No project created response returned from Gitlab."
-getKeyRsp (Right [r]) = flip parseEither r $ (\o -> do
+getKeyRsp :: Either String Object -> Either String SResp
+getKeyRsp (Right r) = flip parseEither r $ (\o -> do
   created_at <- o .: "created_at" 
   updated_at <- o .: "updated_at" 
   event_name <- o .: "event_name" 
