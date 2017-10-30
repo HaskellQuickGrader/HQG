@@ -1,4 +1,4 @@
-module Main where
+module CGIClone.Main where
 
 import Network.CGI 
 import System.IO
