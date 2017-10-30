@@ -26,7 +26,7 @@ cgiMain = do
         case header of
             Nothing -> error "Error no header."
             Just h -> do
-            if(h == "eNbbFFBqgBq5TSGdUtWr9gw4WXptmKbKQKp3P8bPAksYyKvx")
+            if(h == "GUC#Wwdk6x!5dtrrnb#8W$p%$wMgMd7xCvr$CNHmy#D%Vf&Ux6")
                 then do
                     -- Get info from git push
                     listUser
@@ -123,7 +123,7 @@ runAHGSetup url hwkNum repoFolder studentName = do
     case extCode of
        ExitSuccess -> do 
                    liftIO.begin.show $ "Finished grading homework, pushing grade report to repo"
-                   let gitUrl = getGitUrlWithCreds "root" "password" url 0
+                   let gitUrl = getGitUrlWithCreds url 0
                    liftIO $ runGitPush gitUrl repoFolder
                    output ""
        _ -> do

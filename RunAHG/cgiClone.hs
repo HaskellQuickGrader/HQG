@@ -8,16 +8,15 @@ import CGI_Modules.TransferData
 import CGI_Modules.ParseSystemEventInfo
 import qualified Data.ByteString.Lazy.Char8 as B
 
-
 composeCloneURL :: String -> Int -> Int -> String
 composeCloneURL [] countColon countSlash= []
 composeCloneURL (x:xs) countColon countSlash | x == ':' = if (countColon == 1)
                                                             then []     -- Reached the port number
-                                                            else x:composeCloneURL xs (countColon +1) countSlash
+                                                            else composeCloneURL xs (countColon +1) countSlash
                                              | x == '/' = if(countSlash == 1)   -- Need to add gitlab username and password
-                                                            then x:"root:password@"++composeCloneURL xs countColon 2
-                                                            else x:composeCloneURL xs countColon (countSlash+1)
-                                             | otherwise = x:composeCloneURL xs countColon countSlash
+                                                            then "git@" ++ xs
+                                                            else composeCloneURL xs countColon (countSlash+1)
+                                             | otherwise = composeCloneURL xs countColon countSlash
 
 cgiMain :: CGI CGIResult
 cgiMain = do
@@ -31,7 +30,7 @@ cgiMain = do
         case headerToken of
             Nothing -> error "Error no token header."
             Just ht -> do
-            if(ht == "eNbbFFBqgBq5TSGdUtWr9gw4WXptmKbKQKp3P8bPAksYyKvx") -- make sure secret token is present
+            if(ht == "GUC#Wwdk6x!5dtrrnb#8W$p%$wMgMd7xCvr$CNHmy#D%Vf&Ux6") -- make sure secret token is present
             -- Determine which type of event just occured
                 then do
                     headerEvent <- requestHeader "X-Gitlab-Event"

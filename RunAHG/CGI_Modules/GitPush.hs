@@ -19,12 +19,12 @@ runGitPush gitUrl repoFolder = do
             return ()
  
                 
-getGitUrlWithCreds :: String -> String -> String -> Int -> String
-getGitUrlWithCreds usrname pswd [] slashCount = []
-getGitUrlWithCreds usrname pswd gitUrl@(x:xs) slashCount | x == '/' = if(slashCount == 1)
-                                                                        then x:usrname++":"++pswd++"@"++xs
-                                                                        else x:getGitUrlWithCreds usrname pswd xs (slashCount + 1)
-                                                         | otherwise = x:getGitUrlWithCreds usrname pswd xs slashCount
+getGitUrlWithCreds :: String -> Int -> String
+getGitUrlWithCreds [] slashCount = []
+getGitUrlWithCreds gitUrl@(x:xs) slashCount | x == '/' = if(slashCount == 1)
+                                                       	 then "git@"++xs
+                                                         else getGitUrlWithCreds xs (slashCount + 1)
+                                            | otherwise = getGitUrlWithCreds xs slashCount
                                   
 
 
