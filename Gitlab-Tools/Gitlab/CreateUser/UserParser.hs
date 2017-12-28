@@ -23,9 +23,9 @@ parseUsername = do
   return $ a : r
 
 parseName = do
-  last <- upper >>= (\c -> many (lower <|> char '-') >>= return.(c:))
+  last <- upper >>= (\c -> many (lower <|> upper <|> char '-') >>= return.(c:))
   char ','
-  first <- upper >>= (\c -> many (lower <|> char '-') >>= return.(c:))
+  first <- upper >>= (\c -> many (lower <|> upper <|> char '-') >>= return.(c:))
   char '$'
   return $ first ++ " " ++ last
 

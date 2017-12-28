@@ -9,3 +9,7 @@
 /Hwk/Hwk1/*.exe
 /Hwk/Hwk1/*.txt
 *.txt
+*.o
+*.hi
+*dyn_hi
+*.dyn_o
