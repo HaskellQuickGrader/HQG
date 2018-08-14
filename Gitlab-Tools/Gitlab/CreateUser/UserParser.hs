@@ -5,7 +5,7 @@ LANGUAGE
   TemplateHaskell, 
   FlexibleContexts 
 #-}
-module CreateUser.UserParser where
+module UserParser where
 
 import Data.Char
 import Text.Parsec hiding (Empty)
@@ -13,8 +13,8 @@ import Text.Parsec.Token
 import Text.Email.Validate
 import qualified Data.ByteString.Char8 as B
 
-import CreateUser.User
-import qualified CreateUser.UserCreate as UC
+import User
+import qualified UserCreate as UC
     
 parseUsername = do
   a <- lower
@@ -23,7 +23,7 @@ parseUsername = do
   return $ a : r
 
 parseName = do
-  last <- upper >>= (\c -> many (lower <|> upper <|> char '-') >>= return.(c:))
+  last <- upper >>= (\c -> many (lower <|> upper <|> char '-' <|> char '\'') >>= return.(c:))
   char ','
   first <- upper >>= (\c -> many (lower <|> upper <|> char '-') >>= return.(c:))
   char '$'
@@ -62,11 +62,11 @@ dropSpaces = filter (not.isSpace)
 buildUsers :: [[String]] -> IO [User]
 buildUsers [] = return []
 buildUsers ([name,username,email,groupName,repoName]:ls)
-    | (validateUsername (username++"$")) && (validateEmail (email++"$"))
+    | (validateUsername (username++"$")) && (validateEmail email)
                                          && (validateGroupName (groupName++"$"))
                                          && (validateProjName (repoName++"$"))
     = case (validateName (name++"$")) of
-          Nothing -> error "Parse Error: Every line must contain: name, username, and email."
+          Nothing -> error $ "Parse Error on name "++(show name)
           Just name' -> do rest <- buildUsers ls
                            return $ usr name' : rest
  where
@@ -87,4 +87,4 @@ buildUsers ([name,username,email,groupName,repoName]:ls)
            issues_enabled = "true",
            visibility = "private"
          }
-buildUsers _ = error "Parse Error: Every line must contain: name, username, and email."
+buildUsers _ = error "Parse Error: somethings wrong with the username, email, group name, or repo name fields."

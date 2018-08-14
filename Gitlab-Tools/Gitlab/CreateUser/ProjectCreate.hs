@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleInstances #-}
-module CreateUser.ProjectCreate where
+module ProjectCreate where
 
 import Data.Aeson
 import Data.Aeson.Types
@@ -9,7 +9,7 @@ import Network.HTTP.Simple
 import Data.Text as T
 import Data.ByteString.Lazy.Char8 as CH
 
-import CreateUser.User   
+import User   
 import Query
 import qualified Namespace as NS
 

@@ -1,17 +1,17 @@
-module CreateUser.Main where
+module Main where
 
 import System.Environment
 import Data.List.Split
 
 import Query
-import CreateUser.User
-import qualified CreateUser.UserCreate as UC
-import qualified CreateUser.ProjectCreate as PC
-import CreateUser.UserParser
+import User
+import qualified UserCreate as UC
+import qualified ProjectCreate as PC
+import UserParser
 
 createUsers :: FilePath -> IO (String, [User], [Either String PC.SResp])
-createUsers file = do
-         ls <- readFile file >>= return.lines
+createUsers file = do         
+         ls <- readFile file >>= return.lines         
          let ls' = map ((splitOn "|").dropSpaces) ls
          users <- buildUsers ls'
          rsp <- UC.responses defaultResp users
@@ -37,7 +37,7 @@ createUsers file = do
 
 main :: IO ()
 main = getArgs >>= process
- where
+ where   
     process [] = error "A file path must be given."
     process (path:_) = do
           (e, users, prjs) <- createUsers path
