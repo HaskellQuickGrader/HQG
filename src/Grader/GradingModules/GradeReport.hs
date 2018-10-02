@@ -1,8 +1,8 @@
-module GradingModules.GradeReport where
+module Grader.GradingModules.GradeReport where
 
 import System.IO
 import Test.QuickCheck
-import CGI_Modules.TransferData
+import CGI.CGI_Modules.TransferData
 
 import Data.Char(toUpper)
 

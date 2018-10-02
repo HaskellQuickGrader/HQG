@@ -1,5 +1,5 @@
 {-# LANGUAGE DuplicateRecordFields #-}
-module CGI_Modules.Commits where
+module CGI.CGI_Modules.Commits where
 
 data Commit = Commit {	id :: String,
 						message :: String,

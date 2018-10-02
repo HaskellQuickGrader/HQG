@@ -1,4 +1,4 @@
-module Hwk.Hwk1Sol where
+module Grader.GradingModules.Hwk1Sol where
 
 import Prelude hiding ((++), all, foldr)
 

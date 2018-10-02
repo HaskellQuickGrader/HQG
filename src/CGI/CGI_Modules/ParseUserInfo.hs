@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric, DuplicateRecordFields, OverloadedLabels #-}
 
-module CGI_Modules.ParseUserInfo (Commit(..),Author(..),Repo(..),User(..), Project(..), parseJSON)where
+module CGI.CGI_Modules.ParseUserInfo (Commit(..),Author(..),Repo(..),User(..), Project(..), parseJSON)where
     
 
 import GHC.Generics

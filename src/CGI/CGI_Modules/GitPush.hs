@@ -1,10 +1,10 @@
 {-# OPTIONS_GHC -fno-warn-tabs #-}
-module CGI_Modules.GitPush where
+module CGI.CGI_Modules.GitPush where
 
 import Network.CGI 
 import System.Process
 import System.Exit
-import CGI_Modules.TransferData
+import CGI.CGI_Modules.TransferData
 
 runGitPush :: String -> String -> IO ()
 runGitPush gitUrl repoFolder = do   

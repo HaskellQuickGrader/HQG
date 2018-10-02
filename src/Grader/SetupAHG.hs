@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -fno-warn-tabs #-}
-
+module Grader.SetupAHG where
 import System.IO
 import Data.List.Utils
 import System.Environment
@@ -9,7 +9,7 @@ import Control.Monad
 import System.Exit
 
 
-import CGI_Modules.TransferData
+import CGI.CGI_Modules.TransferData
 
 -- command line arguments must follow this order:
 -- First argument is the Homework Number
