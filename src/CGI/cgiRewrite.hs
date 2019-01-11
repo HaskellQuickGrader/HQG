@@ -2,11 +2,11 @@ module CGI.CGIRewrite where
 import Network.CGI
 import System.IO
 import SystemHook
-import SystemHook.GroupM
 import Query
 import qualified Data.ByteString.Lazy.Char8 as CH
 import System.Directory
 import System.Process
+import CGI.Clone.Clone
 
 import CGI.Clone.Clone
 
@@ -50,6 +50,7 @@ processSystemHook inputs = do
                       Injl (Injl (Injl (Injl (Injl (Injl (Injr g)))))) -> do
                                                                            liftIO.logStr $ "Move user to group"
                                                                            liftIO.logStr $ show g
+                                                                           let dontneed = clone g 
                                                                            output ""
                        
   liftIO.logStr.show $ d          
