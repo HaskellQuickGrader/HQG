@@ -20,6 +20,8 @@ clone (GroupM {event_name = en,
                                             then do
                                                 let url = gitURL uun
                                                 (exitCode,standardOut,standardErr) <- readProcessWithExitCode "CGI/Clone/./CloneRepo.sh" [url,uun] ""
-                                                undefined
-                                            else return ()
-                                       else return()
+                                                case exitCode of
+                                                    ExitSuccess -> return() 
+                                                    _ -> return () --Need to write error message somewhere
+                                            else return () -- If hits here not the right group. no need to do anything
+                                       else return() -- If hits here not the right action, no need to do anything
