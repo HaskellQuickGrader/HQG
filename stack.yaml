@@ -38,7 +38,7 @@ packages:
 # Dependency packages to be pulled from upstream that are not in the resolver
 # using the same syntax as the packages field.
 # (e.g., acme-missiles-0.3)
-extra-deps: 
+extra-deps:
 - archive: https://github.com/HaskellQuickGrader/Haskell-Gitlab-API/archive/master.zip
 - strings-1.1
 - url-2.1.3
